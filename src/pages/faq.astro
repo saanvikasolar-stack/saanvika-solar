@@ -1,0 +1,236 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { queryFaqItems } from "../lib/faq";
+
+let faqItems = await queryFaqItems();
+
+const fallbackItems = [
+  {
+    _id: "fallback-1",
+    question: "Do you handle PM Surya Ghar subsidy paperwork from Kakinada?",
+    answerHtml:
+      "<p>Yes. We are a registered PM Surya Ghar MNRE vendor. From portal application to the subsidy stages, we walk you through the forms — in plain Telugu or English, whichever you prefer. You do not need a Hyderabad consultant for this.</p>",
+    sortOrder: 1,
+  },
+  {
+    _id: "fallback-2",
+    question: "How does APEPDCL net metering work on my bill?",
+    answerHtml:
+      "<p>After install, APEPDCL fits a bi-directional meter. Units your panels export go back to the grid and offset what you draw at night or on cloudy days. On a good Godavari coast summer month, many homes see the bill drop hard once net metering is live.</p>",
+    sortOrder: 2,
+  },
+  {
+    _id: "fallback-3",
+    question: "My terrace gets fierce afternoon sun — is that enough?",
+    answerHtml:
+      "<p>Kakinada heat is exactly why rooftop solar pays here. We survey shade from water tanks, stair rooms, and neighbouring buildings, then size the array for real peak hours — not brochure watts. Free site survey if you want numbers for your roof.</p>",
+    sortOrder: 3,
+  },
+  {
+    _id: "fallback-4",
+    question: "How long from survey to switch-on?",
+    answerHtml:
+      "<p>Typical path: survey and design, APEPDCL / DISCOM paperwork, install, then meter change and commissioning. Timelines move with load sanction and inspection slots — we keep you updated so you are not guessing.</p>",
+    sortOrder: 4,
+  },
+  {
+    _id: "fallback-5",
+    question: "What about salt air near the coast?",
+    answerHtml:
+      "<p>Homes closer to the bay need mounts and earthing done right. We use coastal-aware hardware and sealing practices so fasteners and junctions last through monsoon humidity — not just the first summer.</p>",
+    sortOrder: 5,
+  },
+  {
+    _id: "fallback-6",
+    question: "Can I book a free site survey?",
+    answerHtml:
+      "<p>Yes — book a Free Site Survey from our services page, or message us on Contact with your area (Suryaraopeta, Ramanayyapeta, Jagannaickpur, and around). Bring a recent APEPDCL bill if you have one; it helps us size faster.</p>",
+    sortOrder: 6,
+  },
+];
+
+const usingFallback = faqItems.length === 0;
+if (usingFallback) faqItems = fallbackItems;
+---
+
+<Layout
+  title="FAQ"
+  description="Kakinada rooftop solar FAQ — PM Surya Ghar subsidy, APEPDCL net metering, coastal installs, and site surveys from Saanvika Solar Systems."
+>
+  <section class="faq-page relative overflow-hidden">
+    <div
+      class="faq-header-block"
+      aria-hidden="true"
+      data-decorative-slot="cmsHeader"
+      style="background-color: var(--color-paper-warm);"
+    ></div>
+
+    <div class="max-w-6xl mx-auto px-lg pt-3xl md:pt-4xl pb-xl relative">
+      <div class="container-reading faq-intro">
+        <p class="font-display text-sm tracking-wide uppercase text-mute mb-sm">
+          Saanvika Solar Systems
+        </p>
+        <h1 class="font-display text-4xl md:text-5xl leading-tight text-ink mb-md">
+          Questions we hear on Kakinada rooftops
+        </h1>
+        <p class="text-lg text-ink-soft leading-relaxed">
+          Subsidy stages, APEPDCL net metering, summer bills, and coastal installs — answered the way neighbours ask them.
+        </p>
+      </div>
+    </div>
+
+    <div class="faq-section max-w-6xl mx-auto px-lg pb-3xl md:pb-4xl">
+      <div class="container-reading flex flex-col gap-sm">
+        {
+          faqItems.map((item, index) => (
+            <details class="faq-item" open={index === 0}>
+              <summary class="faq-question">
+                <span>{item.question}</span>
+                <svg
+                  class="faq-toggle"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <polyline points="6 9 12 15 18 9" />
+                </svg>
+              </summary>
+              <div class="faq-answer" set:html={item.answerHtml} />
+            </details>
+          ))
+        }
+      </div>
+
+      <div class="container-reading mt-2xl flex flex-wrap gap-md">
+        <a href="/contact" class="btn-primary">Still unsure? Ask us</a>
+        <a href="/about" class="btn-secondary">About our Kakinada crew</a>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .faq-page {
+    background:
+      linear-gradient(180deg, var(--color-paper-warm) 0%, var(--color-paper) 28%, var(--color-paper) 100%);
+  }
+
+  .faq-header-block {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 12rem;
+    background:
+      repeating-linear-gradient(
+        -18deg,
+        transparent,
+        transparent 18px,
+        color-mix(in srgb, var(--color-rule) 45%, transparent) 18px,
+        color-mix(in srgb, var(--color-rule) 45%, transparent) 19px
+      ),
+      radial-gradient(ellipse 70% 80% at 10% 0%, color-mix(in srgb, var(--color-accent) 16%, transparent), transparent 60%),
+      var(--color-paper-warm);
+    opacity: 0.9;
+    pointer-events: none;
+  }
+
+  .faq-intro {
+    animation: faq-rise 650ms ease both;
+  }
+
+  .faq-item {
+    border: 1px solid var(--color-rule);
+    border-radius: var(--radius-md);
+    background: var(--color-paper);
+    padding: 0;
+    overflow: hidden;
+    transition: border-color 180ms ease, box-shadow 180ms ease;
+    animation: faq-rise 650ms ease both;
+  }
+
+  .faq-item:nth-child(1) { animation-delay: 40ms; }
+  .faq-item:nth-child(2) { animation-delay: 80ms; }
+  .faq-item:nth-child(3) { animation-delay: 120ms; }
+  .faq-item:nth-child(4) { animation-delay: 160ms; }
+  .faq-item:nth-child(5) { animation-delay: 200ms; }
+  .faq-item:nth-child(6) { animation-delay: 240ms; }
+
+  .faq-item[open] {
+    border-color: color-mix(in srgb, var(--color-accent) 55%, var(--color-rule));
+    box-shadow: 0 10px 28px color-mix(in srgb, var(--color-ink) 6%, transparent);
+  }
+
+  .faq-question {
+    list-style: none;
+    cursor: pointer;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md) var(--spacing-lg);
+    font-family: var(--font-display);
+    font-size: 1.05rem;
+    line-height: 1.35;
+    color: var(--color-ink);
+  }
+
+  .faq-question::-webkit-details-marker {
+    display: none;
+  }
+
+  .faq-toggle {
+    width: 1.15rem;
+    height: 1.15rem;
+    flex-shrink: 0;
+    margin-top: 0.2rem;
+    color: var(--color-accent);
+    transition: transform 200ms ease;
+  }
+
+  .faq-item[open] .faq-toggle {
+    transform: rotate(180deg);
+  }
+
+  .faq-answer {
+    padding: 0 var(--spacing-lg) var(--spacing-lg);
+    color: var(--color-ink-soft);
+    line-height: 1.65;
+  }
+
+  .faq-answer :global(p + p) {
+    margin-top: var(--spacing-sm);
+  }
+
+  .faq-answer :global(a) {
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+  }
+
+  @keyframes faq-rise {
+    from {
+      opacity: 0;
+      transform: translateY(0.5rem);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .faq-intro,
+    .faq-item {
+      animation: none;
+    }
+    .faq-toggle {
+      transition: none;
+    }
+  }
+</style>

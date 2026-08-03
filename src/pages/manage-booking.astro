@@ -1,0 +1,71 @@
+---
+// Per-booking manage page (view + cancel via anonymous action token).
+import Layout from "../layouts/Layout.astro";
+import ManageBooking from "../components/ManageBooking";
+import { auth } from "@wix/essentials";
+import { bookings } from "@wix/bookings";
+
+const bookingId = Astro.url.searchParams.get("bookingId");
+
+let token: string | null = null;
+let booking: any = null;
+let allowed = { cancel: false, reschedule: false };
+let error: string | null = null;
+
+if (!bookingId) {
+  error = "No booking was specified.";
+} else {
+  try {
+    const tokenRes = await auth.elevate(bookings.getAnonymousActionToken)(bookingId);
+    token = tokenRes.token ?? null;
+    if (token) {
+      const res = await bookings.bookingsGetBookingAnonymously(token);
+      booking = res.booking ?? null;
+      allowed = {
+        cancel: !!res.allowedAnonymousActions?.cancel,
+        reschedule: !!res.allowedAnonymousActions?.reschedule,
+      };
+    }
+  } catch (err) {
+    console.error("[manage-booking] load failed:", err);
+    error = "We couldn't load this booking — the link may have expired.";
+  }
+}
+
+const serviceName =
+  booking?.bookedEntity?.title ?? Astro.url.searchParams.get("service") ?? "your booking";
+const startDate =
+  (booking?.startDate as string | undefined) ??
+  booking?.bookedEntity?.slot?.startDate ??
+  Astro.url.searchParams.get("startDate") ??
+  null;
+const status = (booking?.status as string | undefined) ?? null;
+const revision = (booking?.revision as string | undefined) ?? "";
+---
+
+<Layout title="Manage your booking">
+  <section class="container-reading px-lg py-4xl">
+    <a href="/services" class="inline-block text-sm text-mute hover:text-ink mb-xl">← All services</a>
+    <hr class="editorial-rule w-16 ml-0" />
+    <h1 class="font-display text-4xl md:text-5xl leading-tight mb-md">Manage your booking</h1>
+    <p class="text-mute mb-xl max-w-prose">
+      Need to reschedule a survey or consultation? Cancel below, then pick a new time that works for your household.
+    </p>
+
+    {
+      error ? (
+        <p class="booking-error">{error}</p>
+      ) : (
+        <ManageBooking
+          token={token}
+          revision={revision}
+          serviceName={serviceName}
+          startDate={startDate}
+          status={status}
+          canCancel={allowed.cancel}
+          client:only="react"
+        />
+      )
+    }
+  </section>
+</Layout>

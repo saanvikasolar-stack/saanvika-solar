@@ -1,0 +1,89 @@
+---
+// Service detail + client-side booking flow.
+import Layout from "../../layouts/Layout.astro";
+import SeoTags from "../../components/SeoTags.astro";
+import ServiceBookingFlow from "../../components/ServiceBookingFlow";
+import { services } from "@wix/bookings";
+import { auth } from "@wix/essentials";
+
+const { slug } = Astro.params;
+
+let service: any = null;
+try {
+  const result = await auth.elevate(services.queryServices)().limit(100).find();
+  service =
+    (result.items ?? []).find(
+      (s: any) => (s.mainSlug?.name ?? s.supportedSlugs?.[0]?.name) === slug,
+    ) ?? null;
+} catch (err) {
+  console.error(`[services/${slug}] detail query failed:`, err);
+}
+
+if (!service) return Astro.redirect("/services", 302);
+
+const formatPrice = (p: any): string | undefined => {
+  if (!p || p.rateType === "NO_FEE") return "Free";
+  if (p.rateType === "FIXED" && p.fixed?.price) {
+    const { value, currency } = p.fixed.price;
+    if (!value || Number(value) === 0) return "Free";
+    return new Intl.NumberFormat("en-IN", { style: "currency", currency: currency ?? "INR" }).format(Number(value));
+  }
+  return undefined;
+};
+
+const price = formatPrice(service.payment);
+const duration = service.schedule?.availabilityConstraints?.sessionDurations?.[0] ?? 60;
+const imageUrl = service.media?.mainMedia?.image?.url ?? service.media?.items?.[0]?.image?.url;
+const serviceName = service.name ?? "Service";
+const seoTags = service.seoData?.tags ?? [];
+const isFreeSurvey = (service.mainSlug?.name ?? "") === "free-site-survey" || price === "Free";
+---
+
+<Layout title={serviceName} description={service.tagLine ?? service.description} hasSeoTags={seoTags.length > 0}>
+  <SeoTags tags={seoTags} slot="head" />
+  <section class="container-reading px-lg py-4xl">
+    <a href="/services" class="inline-block text-sm text-mute hover:text-ink mb-xl">← All services</a>
+
+    {imageUrl && (
+      <img src={imageUrl} alt={serviceName} class="w-full h-64 object-cover rounded-lg mb-xl" />
+    )}
+
+    <div class="flex flex-col gap-md mb-3xl">
+      <hr class="editorial-rule w-16 ml-0" />
+      {isFreeSurvey && (
+        <p class="text-sm font-medium tracking-wide uppercase" style="color: var(--color-accent);">
+          Recommended first step
+        </p>
+      )}
+      <h1 class="font-display text-4xl md:text-5xl leading-tight">{serviceName}</h1>
+      {service.tagLine && <p class="text-lg text-mute leading-relaxed max-w-prose">{service.tagLine}</p>}
+      <div class="flex items-center gap-md text-sm text-mute">
+        <span>{duration} min</span>
+        {price && <span class="text-ink font-medium">{price}</span>}
+      </div>
+      {service.description && <p class="text-ink leading-relaxed max-w-prose">{service.description}</p>}
+      {!service.description && isFreeSurvey && (
+        <p class="text-ink leading-relaxed max-w-prose">
+          A Saanvika engineer visits your home in Kakinada, assesses rooftop space and shade, and explains sizing, net metering, and PM Surya Ghar subsidy options — at no charge.
+        </p>
+      )}
+    </div>
+
+    <section class="border-t border-rule pt-2xl">
+      <h2 class="font-display text-3xl leading-tight mb-md">
+        {isFreeSurvey ? "Pick a survey time" : "Book this service"}
+      </h2>
+      <p class="text-mute mb-xl max-w-prose">
+        {isFreeSurvey
+          ? "Choose a morning or afternoon slot that works for your household. We'll confirm by email."
+          : "Select an available time below — our Kakinada team will take it from there."}
+      </p>
+      <ServiceBookingFlow
+        serviceId={service._id}
+        serviceName={serviceName}
+        serviceType={service.type ?? "APPOINTMENT"}
+        client:only="react"
+      />
+    </section>
+  </section>
+</Layout>
