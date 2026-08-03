@@ -9,7 +9,6 @@ try {
   const result = await auth.elevate(services.queryServices)().limit(100).find();
   const all = (result.items ?? []).filter((s: any) => !s.hidden);
   const getSlug = (s: any): string => s.mainSlug?.name ?? s.supportedSlugs?.[0]?.name ?? s._id;
-  // Free Site Survey first, then up to 3 total for the teaser.
   homeServices = [...all]
     .sort((a, b) => {
       const rank = (s: any) => (getSlug(s) === 'free-site-survey' ? 0 : 1);
@@ -33,194 +32,123 @@ const formatPrice = (s: any): string | undefined => {
 };
 const getDuration = (s: any): number => s.schedule?.availabilityConstraints?.sessionDurations?.[0] ?? 60;
 ---
-<Layout
-  title="Rooftop solar for Kakinada"
-  description="Saanvika Solar Systems — Kakinada rooftop solar, PM Surya Ghar subsidy, APEPDCL net metering. Book a free site survey."
->
-  <!-- Hero: one composition, brand-first -->
-  <section class="home-hero relative overflow-hidden">
-    <div class="home-hero-wash" aria-hidden="true"></div>
-    <div class="max-w-6xl mx-auto px-lg py-3xl md:py-4xl relative">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-2xl md:gap-3xl items-center">
-        <div class="flex flex-col gap-lg home-hero-copy">
-          <img
-            src="/brand/logo.jpeg"
-            alt="Saanvika Solar Systems"
-            width="88"
-            height="88"
-            class="home-hero-logo"
-          />
-          <h1 class="font-display text-4xl md:text-5xl leading-tight">
-            Rooftop solar, built for Kakinada heat.
-          </h1>
-          <p class="text-lg text-mute max-w-prose home-hero-lede">
-            Godavari coast sun is fierce — we size panels for real terrace heat, APEPDCL bills, and PM Surya Ghar subsidy paperwork you do not want to chase alone.
-          </p>
-          <div class="flex flex-wrap gap-md items-center">
-            <a href="/services/free-site-survey" class="btn-primary">Book free site survey</a>
-            <a href="#subsidy" class="btn-secondary">See how subsidy works</a>
-          </div>
+<Layout>
+  <section class="hero-band relative overflow-hidden">
+    <div class="hero-glow" aria-hidden="true"></div>
+    <div class="max-w-6xl mx-auto px-lg py-4xl grid grid-cols-1 md:grid-cols-2 gap-3xl items-center">
+      <div class="flex flex-col gap-lg hero-copy">
+        <img
+          src="/brand/logo.jpeg"
+          alt="Saanvika Solar Systems"
+          width="72"
+          height="72"
+          class="brand-mark"
+        />
+        <p class="eyebrow">Kakinada · PM Surya Ghar MNRE vendor</p>
+        <h1 class="font-display text-4xl md:text-5xl leading-tight">
+          Rooftop solar, built for Kakinada heat.
+        </h1>
+        <p class="text-lg text-mute max-w-prose">
+          When the APEPDCL bill climbs every summer, your roof can push back. We design, install,
+          file the subsidy, and get your net meter moving — the way a neighbour from here would.
+        </p>
+        <div class="flex flex-wrap gap-md items-center">
+          <a href="/services/free-site-survey" class="btn-primary">Book free site survey</a>
+          <a href="#subsidy" class="btn-secondary">See how subsidy works</a>
         </div>
-        <div
-          class="hero-visual rounded-md"
-          data-decorative-slot="hero"
-          aria-hidden="true"
-        >
-          <!-- orchestrator injects <img src={decorativeImages.hero} …> here -->
-          <div class="hero-geo"></div>
-        </div>
+      </div>
+      <div
+        class="hero-visual rounded-md"
+        data-decorative-slot="hero"
+        aria-hidden="true"
+      >
+        <div class="sun-burst"></div>
+        <div class="panel-grid"></div>
       </div>
     </div>
   </section>
 
-  <!-- Trust strip — below the fold -->
-  <section class="trust-strip border-y border-rule" aria-label="Our track record">
-    <div class="max-w-6xl mx-auto px-lg py-2xl">
-      <p class="text-xs uppercase tracking-widest text-mute mb-lg">Numbers from our Kakinada work</p>
-      <dl class="trust-grid">
-        <div class="trust-stat">
-          <dt class="trust-num">296</dt>
-          <dd class="trust-label">rooftops installed</dd>
-        </div>
-        <div class="trust-stat">
-          <dt class="trust-num">373</dt>
-          <dd class="trust-label">PM Surya Ghar apps</dd>
-        </div>
-        <div class="trust-stat">
-          <dt class="trust-num">290</dt>
-          <dd class="trust-label">subsidies redeemed</dd>
-        </div>
-        <div class="trust-stat">
-          <dt class="trust-num">292</dt>
-          <dd class="trust-label">inspections cleared</dd>
-        </div>
-      </dl>
+  <section class="trust-strip border-y border-rule bg-paper-warm/40">
+    <div class="max-w-6xl mx-auto px-lg py-2xl grid grid-cols-2 md:grid-cols-4 gap-xl">
+      <div>
+        <p class="font-display text-3xl text-accent">296</p>
+        <p class="text-sm text-mute">Rooftop systems installed</p>
+      </div>
+      <div>
+        <p class="font-display text-3xl text-accent">373</p>
+        <p class="text-sm text-mute">PM Surya Ghar applications</p>
+      </div>
+      <div>
+        <p class="font-display text-3xl text-accent">290</p>
+        <p class="text-sm text-mute">Subsidies redeemed</p>
+      </div>
+      <div>
+        <p class="font-display text-3xl text-accent">292</p>
+        <p class="text-sm text-mute">Site inspections approved</p>
+      </div>
     </div>
   </section>
 
-  <!-- PM Surya Ghar subsidy -->
-  <section id="subsidy" class="max-w-6xl mx-auto px-lg py-4xl scroll-mt-24">
-    <header class="flex flex-col gap-md max-w-prose mb-2xl">
-      <hr class="editorial-rule w-16 ml-0 accent-underline" />
-      <h2 class="font-display text-3xl md:text-4xl leading-tight">PM Surya Ghar subsidy, plain talk</h2>
+  <section id="subsidy" class="max-w-6xl mx-auto px-lg py-4xl">
+    <header class="flex flex-col gap-md max-w-prose mb-3xl">
+      <hr class="editorial-rule w-16 ml-0" />
+      <h2 class="font-display text-3xl md:text-4xl leading-tight">Your PM Surya Ghar subsidy, explained</h2>
       <p class="text-mute leading-relaxed">
-        Central subsidy for residential rooftop — the money lands after your system is live and paperwork clears. We handle the forms; you keep the bill drop.
+        Under the Central Government scheme, homeowners get direct support — we file every paper
+        with the portal and APEPDCL so you don’t chase offices in the heat.
       </p>
     </header>
     <div class="subsidy-grid">
-      <div class="subsidy-row">
-        <span class="subsidy-tier font-display">First 2 kW</span>
-        <span class="subsidy-amount">₹30,000 / kW</span>
-        <span class="subsidy-note text-mute text-sm">Up to ₹60,000 on a 2 kW system</span>
+      <div>
+        <p class="font-display text-2xl text-ink">₹30,000 / kW</p>
+        <p class="text-sm text-mute">First 2 kW</p>
       </div>
-      <div class="subsidy-row">
-        <span class="subsidy-tier font-display">Next 1 kW</span>
-        <span class="subsidy-amount">₹18,000 / kW</span>
-        <span class="subsidy-note text-mute text-sm">Adds ₹18,000 for going to 3 kW</span>
+      <div>
+        <p class="font-display text-2xl text-ink">₹18,000 / kW</p>
+        <p class="text-sm text-mute">Next 1 kW</p>
       </div>
-      <div class="subsidy-row subsidy-row--cap">
-        <span class="subsidy-tier font-display">Maximum</span>
-        <span class="subsidy-amount">₹78,000</span>
-        <span class="subsidy-note text-mute text-sm">Cap for systems 3 kW and above</span>
-      </div>
-    </div>
-    <p class="text-sm text-mute mt-xl max-w-prose">
-      Example: a typical 3 kW Kakinada home gets ₹60k + ₹18k = ₹78k subsidy. We file the PM Surya Ghar application and walk the APEPDCL net-metering steps with you.
-    </p>
-  </section>
-
-  <!-- Bill / savings calculator -->
-  <section class="calc-section bg-paper-warm border-y border-rule" aria-labelledby="calc-heading">
-    <div class="max-w-6xl mx-auto px-lg py-4xl">
-      <header class="flex flex-col gap-md max-w-prose mb-2xl">
-        <hr class="editorial-rule w-16 ml-0 accent-underline" />
-        <h2 id="calc-heading" class="font-display text-3xl md:text-4xl leading-tight">Rough savings from your bill</h2>
-        <p class="text-mute leading-relaxed">
-          Drag your monthly APEPDCL bill — we sketch system size, subsidy, and payback. Exact numbers come after a free site survey.
-        </p>
-      </header>
-      <div class="calc-block" data-bill-calc>
-        <label class="calc-label" for="bill-slider">
-          Monthly electricity bill
-          <span class="calc-bill-value" data-bill-display>₹3,000</span>
-        </label>
-        <input
-          id="bill-slider"
-          class="calc-slider"
-          type="range"
-          min="1000"
-          max="12000"
-          step="500"
-          value="3000"
-          data-bill-input
-        />
-        <div class="calc-results">
-          <div class="calc-result">
-            <span class="calc-result-label">Suggested size</span>
-            <span class="calc-result-value font-display" data-calc-kw>~3 kW</span>
-          </div>
-          <div class="calc-result">
-            <span class="calc-result-label">Est. subsidy</span>
-            <span class="calc-result-value font-display" data-calc-subsidy>₹78,000</span>
-          </div>
-          <div class="calc-result">
-            <span class="calc-result-label">Rough payback</span>
-            <span class="calc-result-value font-display" data-calc-payback>~4 yrs</span>
-          </div>
-        </div>
-        <p class="text-xs text-mute mt-md">
-          Ballpark only — assumes ~₹6–7/unit, coastal Andhra sun, and standard PM Surya Ghar rates. Site survey locks the real quote.
-        </p>
+      <div>
+        <p class="font-display text-2xl text-accent">₹78,000</p>
+        <p class="text-sm text-mute">Max for systems above 3 kW</p>
       </div>
     </div>
   </section>
 
-  <!-- How it works -->
+  <section class="calc-band bg-ink text-cream">
+    <div class="max-w-6xl mx-auto px-lg py-4xl grid grid-cols-1 md:grid-cols-2 gap-3xl items-center">
+      <div class="flex flex-col gap-md max-w-prose">
+        <hr class="editorial-rule w-16 ml-0 border-accent" />
+        <h2 class="font-display text-3xl leading-tight text-cream">What could your bill save?</h2>
+        <p class="text-cream/80 leading-relaxed">
+          Drag your typical monthly APEPDCL bill. We’ll sketch a system size, subsidy, and rough
+          payback for a clear Kakinada day — confirm exact numbers on the free survey.
+        </p>
+      </div>
+      <div class="calc-panel">
+        <label for="billRange" class="text-sm text-cream/80">Monthly electricity bill (₹)</label>
+        <input id="billRange" type="range" min="1000" max="15000" step="500" value="5000" />
+        <p class="font-display text-3xl" id="billValue">₹5,000 / month</p>
+        <dl class="calc-results">
+          <div><dt>Est. system</dt><dd id="estKw">3.5 kW</dd></div>
+          <div><dt>Est. subsidy</dt><dd id="estSubsidy">₹78,000</dd></div>
+          <div><dt>Rough payback</dt><dd id="estPayback">~4.5 yrs</dd></div>
+        </dl>
+        <a href="/services/free-site-survey" class="btn-primary mt-md">Book free site survey</a>
+      </div>
+    </div>
+  </section>
+
   <section class="max-w-6xl mx-auto px-lg py-4xl">
-    <header class="flex flex-col gap-md max-w-prose mb-2xl">
-      <hr class="editorial-rule w-16 ml-0 accent-underline" />
-      <h2 class="font-display text-3xl md:text-4xl leading-tight">How it works in Kakinada</h2>
-      <p class="text-mute leading-relaxed">
-        Four clear steps — from terrace visit to the meter running backwards on your APEPDCL bill.
-      </p>
+    <header class="flex flex-col gap-md max-w-prose mb-3xl">
+      <hr class="editorial-rule w-16 ml-0" />
+      <h2 class="font-display text-3xl md:text-4xl leading-tight">Four steps. Then the meter runs back.</h2>
+      <p class="text-mute leading-relaxed">From the first rooftop visit in Kakinada to APEPDCL net metering — we stay on it.</p>
     </header>
-    <ol class="steps-list">
-      <li class="step-item">
-        <span class="step-num font-display" aria-hidden="true">01</span>
-        <div>
-          <h3 class="font-display text-xl">Free site survey</h3>
-          <p class="text-mute text-sm leading-relaxed mt-xs">
-            We climb your terrace, check shade and structure, and talk through your summer load — no charge, no pressure.
-          </p>
-        </div>
-      </li>
-      <li class="step-item">
-        <span class="step-num font-display" aria-hidden="true">02</span>
-        <div>
-          <h3 class="font-display text-xl">Design + subsidy</h3>
-          <p class="text-mute text-sm leading-relaxed mt-xs">
-            Panel layout sized for your roof, PM Surya Ghar application filed, and APEPDCL net-metering paperwork started.
-          </p>
-        </div>
-      </li>
-      <li class="step-item">
-        <span class="step-num font-display" aria-hidden="true">03</span>
-        <div>
-          <h3 class="font-display text-xl">Install</h3>
-          <p class="text-mute text-sm leading-relaxed mt-xs">
-            Local crew mounts panels and inverter — tidy wiring, safety clearances, and a clean finish for coastal weather.
-          </p>
-        </div>
-      </li>
-      <li class="step-item">
-        <span class="step-num font-display" aria-hidden="true">04</span>
-        <div>
-          <h3 class="font-display text-xl">Meter runs back</h3>
-          <p class="text-mute text-sm leading-relaxed mt-xs">
-            Bi-directional meter goes live with APEPDCL. Daytime generation offsets your bill — that is when the savings stick.
-          </p>
-        </div>
-      </li>
+    <ol class="steps">
+      <li><span class="step-num">01</span><div><h3 class="font-display text-xl">Free site survey</h3><p class="text-mute text-sm">Shade, structure, and bill check on your roof.</p></div></li>
+      <li><span class="step-num">02</span><div><h3 class="font-display text-xl">Design + subsidy filing</h3><p class="text-mute text-sm">Custom layout and 100% PM Surya Ghar paperwork.</p></div></li>
+      <li><span class="step-num">03</span><div><h3 class="font-display text-xl">Install in a few days</h3><p class="text-mute text-sm">Certified crew, careful mounting, clean handover.</p></div></li>
+      <li><span class="step-num">04</span><div><h3 class="font-display text-xl">Net meter &amp; savings</h3><p class="text-mute text-sm">APEPDCL credits for units you send back to the grid.</p></div></li>
     </ol>
   </section>
 
@@ -262,269 +190,186 @@ const getDuration = (s: any): number => s.schedule?.availabilityConstraints?.ses
     </div>
   </section>
 
-  <!-- About teaser -->
   <section class="max-w-6xl mx-auto px-lg py-4xl grid grid-cols-1 md:grid-cols-2 gap-3xl items-center">
     <div
-      class="about-image rounded-md order-last md:order-first"
+      class="about-image rounded-md order-last md:order-first about-visual"
       data-decorative-slot="about"
-      style="aspect-ratio: 4/3; background-color: var(--color-paper-warm);"
-    >
-      <!-- orchestrator injects <img src={decorativeImages.about} …> here -->
-    </div>
+      aria-hidden="true"
+    ></div>
     <div class="flex flex-col gap-md max-w-prose">
       <hr class="editorial-rule w-16 ml-0" />
-      <h2 class="font-display text-3xl leading-tight">Local crew. Kakinada roofs.</h2>
+      <h2 class="font-display text-3xl leading-tight">Local crew. Local promise.</h2>
       <p class="text-ink leading-relaxed">
-        We grew up under Godavari coast sun — the kind that cooks terrace floors by noon and sends summer APEPDCL bills climbing. Saanvika is a PM Surya Ghar MNRE vendor based right here in Kakinada, not a call centre reading a Hyderabad script.
+        Saanvika Solar Systems grew up with Kakinada’s sun — Godavari-coast heat, summer load, and
+        the paperwork maze that keeps good roofs waiting. We’re a registered PM Surya Ghar vendor
+        who stays until subsidy and inspection are done.
       </p>
       <p class="text-mute leading-relaxed">
-        Plain talk on unit rates, subsidy stages, and what your roof can actually carry. From Suryaraopeta flats to houses catching the bay breeze, we size for real heat.
+        No Hyderabad call-centre runaround. You get people who know APEPDCL lanes and your street’s
+        afternoon glare.
       </p>
-      <a href="/about" class="btn-secondary self-start mt-sm">About Saanvika</a>
+      <a href="/about" class="btn-secondary self-start">Our Kakinada story</a>
     </div>
   </section>
 </Layout>
 
+<script>
+  function subsidyForKw(kw: number) {
+    if (kw <= 0) return 0;
+    const first = Math.min(kw, 2) * 30000;
+    const next = Math.min(Math.max(kw - 2, 0), 1) * 18000;
+    return Math.min(first + next, 78000);
+  }
+
+  function updateCalc() {
+    const input = document.getElementById('billRange') as HTMLInputElement | null;
+    if (!input) return;
+    const bill = Number(input.value);
+    const kw = Math.max(1, Math.min(10, Math.round((bill / 1400) * 10) / 10));
+    const subsidy = subsidyForKw(kw);
+    const annualSave = bill * 12 * 0.85;
+    const netCost = Math.max(kw * 55000 - subsidy, 1);
+    const payback = Math.max(2, Math.round((netCost / annualSave) * 10) / 10);
+
+    const billValue = document.getElementById('billValue');
+    const estKw = document.getElementById('estKw');
+    const estSubsidy = document.getElementById('estSubsidy');
+    const estPayback = document.getElementById('estPayback');
+    if (billValue) billValue.textContent = `₹${bill.toLocaleString('en-IN')} / month`;
+    if (estKw) estKw.textContent = `${kw} kW`;
+    if (estSubsidy) estSubsidy.textContent = `₹${subsidy.toLocaleString('en-IN')}`;
+    if (estPayback) estPayback.textContent = `~${payback} yrs`;
+  }
+
+  const range = document.getElementById('billRange');
+  range?.addEventListener('input', updateCalc);
+  updateCalc();
+</script>
+
 <style>
-  .home-hero {
-    background:
-      radial-gradient(ellipse 80% 60% at 10% 0%, color-mix(in srgb, var(--color-cream) 70%, transparent), transparent 55%),
-      radial-gradient(ellipse 50% 40% at 90% 20%, color-mix(in srgb, var(--color-accent) 12%, transparent), transparent 50%),
-      var(--color-paper);
-  }
-  .home-hero-wash {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    background:
-      linear-gradient(135deg, transparent 60%, color-mix(in srgb, var(--color-ink) 4%, transparent) 100%);
-  }
-  .home-hero-logo {
-    width: 5.5rem;
-    height: 5.5rem;
-    object-fit: contain;
-    border-radius: var(--radius-md);
-  }
-  .home-hero-copy {
+  .brand-mark {
+    border-radius: 9999px;
+    object-fit: cover;
+    box-shadow: 0 10px 30px -12px rgb(13 44 68 / 35%);
     animation: fade-up 0.7s ease both;
   }
-  .home-hero-lede {
-    animation: fade-up 0.7s ease 0.1s both;
+  .eyebrow {
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-mute);
+    font-weight: 600;
+  }
+  .hero-copy > * {
+    animation: fade-up 0.7s ease both;
+  }
+  .hero-copy > *:nth-child(2) { animation-delay: 0.05s; }
+  .hero-copy > *:nth-child(3) { animation-delay: 0.1s; }
+  .hero-copy > *:nth-child(4) { animation-delay: 0.15s; }
+  .hero-copy > *:nth-child(5) { animation-delay: 0.2s; }
+
+  .hero-band {
+    background:
+      radial-gradient(1200px 500px at 85% 10%, color-mix(in oklab, var(--color-accent) 18%, transparent), transparent 60%),
+      linear-gradient(180deg, var(--color-paper) 0%, var(--color-paper-warm) 100%);
   }
   .hero-visual {
     position: relative;
     aspect-ratio: 4 / 5;
-    min-height: 16rem;
-    background: linear-gradient(
-      160deg,
-      var(--color-ink) 0%,
-      color-mix(in srgb, var(--color-ink) 78%, var(--color-accent)) 48%,
-      var(--color-accent) 100%
-    );
-    overflow: hidden;
-  }
-  .hero-geo {
-    position: absolute;
-    inset: 0;
     background:
-      linear-gradient(45deg, transparent 40%, color-mix(in srgb, var(--color-cream) 18%, transparent) 40.5%, transparent 41%),
-      linear-gradient(-25deg, transparent 55%, color-mix(in srgb, var(--color-paper) 12%, transparent) 55.5%, transparent 56%),
-      radial-gradient(circle at 72% 28%, color-mix(in srgb, var(--color-cream) 45%, transparent) 0%, transparent 42%),
-      repeating-linear-gradient(
-        -18deg,
-        transparent,
-        transparent 18px,
-        color-mix(in srgb, var(--color-paper) 8%, transparent) 18px,
-        color-mix(in srgb, var(--color-paper) 8%, transparent) 19px
-      );
-    animation: geo-drift 14s ease-in-out infinite alternate;
+      linear-gradient(145deg, var(--color-ink) 0%, #163652 55%, color-mix(in oklab, var(--color-accent) 55%, #163652) 100%);
+    overflow: hidden;
+    animation: fade-up 0.8s ease both 0.1s;
   }
-  .hero-visual > img {
-    position: relative;
-    z-index: 1;
+  .sun-burst {
+    position: absolute;
+    right: -10%;
+    top: -8%;
+    width: 70%;
+    aspect-ratio: 1;
+    border-radius: 9999px;
+    background: radial-gradient(circle at center, var(--color-accent) 0%, color-mix(in oklab, var(--color-accent) 55%, transparent) 55%, transparent 70%);
+    animation: sun-pulse 4s ease-in-out infinite;
   }
-
-  .trust-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: var(--spacing-xl) var(--spacing-lg);
+  .panel-grid {
+    position: absolute;
+    inset: auto 12% 12% 12%;
+    height: 38%;
+    background:
+      linear-gradient(var(--color-rule) 1px, transparent 1px) 0 0 / 24px 24px,
+      linear-gradient(90deg, var(--color-rule) 1px, transparent 1px) 0 0 / 24px 24px,
+      color-mix(in oklab, #1A8BD1 55%, white);
+    border-radius: 0.5rem;
+    opacity: 0.9;
+    transform: perspective(600px) rotateX(18deg);
   }
-  @media (min-width: 768px) {
-    .trust-grid {
-      grid-template-columns: repeat(4, 1fr);
-    }
+  .about-visual {
+    aspect-ratio: 4 / 3;
+    background:
+      linear-gradient(135deg, var(--color-paper-warm), color-mix(in oklab, var(--color-accent) 20%, var(--color-paper))),
+      repeating-linear-gradient(-18deg, transparent, transparent 12px, color-mix(in oklab, var(--color-ink) 6%, transparent) 12px, color-mix(in oklab, var(--color-ink) 6%, transparent) 13px);
   }
-  .trust-num {
-    font-family: var(--font-display);
-    font-size: clamp(2rem, 4vw, 2.75rem);
-    line-height: 1;
-    color: var(--color-ink);
-    letter-spacing: -0.02em;
-  }
-  .trust-label {
-    margin-top: var(--spacing-xs);
-    font-size: 0.875rem;
-    color: var(--color-mute);
-  }
-
   .subsidy-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--spacing-xl);
+  }
+  @media (max-width: 768px) {
+    .subsidy-grid { grid-template-columns: 1fr; }
+  }
+  .calc-panel {
+    background: color-mix(in oklab, white 8%, transparent);
+    border: 1px solid color-mix(in oklab, white 18%, transparent);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-xl);
     display: flex;
     flex-direction: column;
-    gap: 0;
-    border-top: 1px solid var(--color-rule);
-  }
-  .subsidy-row {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: var(--spacing-2xs);
-    padding-block: var(--spacing-lg);
-    border-bottom: 1px solid var(--color-rule);
-  }
-  @media (min-width: 640px) {
-    .subsidy-row {
-      grid-template-columns: 10rem 10rem 1fr;
-      align-items: baseline;
-      gap: var(--spacing-lg);
-    }
-  }
-  .subsidy-amount {
-    font-family: var(--font-display);
-    font-size: 1.25rem;
-    color: var(--color-accent);
-  }
-  .subsidy-row--cap .subsidy-amount {
-    color: var(--color-ink);
-  }
-
-  .calc-block {
-    max-width: var(--container-md);
-    padding: var(--spacing-xl);
-    background: var(--color-paper);
-    border: 1px solid var(--color-rule);
-    border-radius: var(--radius-md);
-  }
-  .calc-label {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
     gap: var(--spacing-md);
-    font-size: 0.9375rem;
-    color: var(--color-ink-soft);
-    margin-bottom: var(--spacing-md);
   }
-  .calc-bill-value {
-    font-family: var(--font-display);
-    font-size: 1.5rem;
-    color: var(--color-ink);
-  }
-  .calc-slider {
+  .calc-panel input[type="range"] {
     width: 100%;
     accent-color: var(--color-accent);
-    margin-bottom: var(--spacing-xl);
   }
   .calc-results {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--spacing-md);
+  }
+  .calc-results dt {
+    font-size: 0.75rem;
+    color: color-mix(in oklab, var(--color-cream) 70%, transparent);
+  }
+  .calc-results dd {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+  }
+  .steps {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
     gap: var(--spacing-lg);
   }
-  @media (min-width: 640px) {
-    .calc-results {
-      grid-template-columns: repeat(3, 1fr);
-    }
-  }
-  .calc-result-label {
-    display: block;
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--color-mute);
-    margin-bottom: var(--spacing-2xs);
-  }
-  .calc-result-value {
-    font-size: 1.5rem;
-    color: var(--color-ink);
-  }
-
-  .steps-list {
+  .steps li {
     display: grid;
-    grid-template-columns: 1fr;
-    gap: var(--spacing-xl);
-  }
-  @media (min-width: 768px) {
-    .steps-list {
-      grid-template-columns: repeat(2, 1fr);
-      gap: var(--spacing-2xl) var(--spacing-xl);
-    }
-  }
-  .step-item {
-    display: flex;
+    grid-template-columns: auto 1fr;
     gap: var(--spacing-md);
-    align-items: flex-start;
+    align-items: start;
+    padding-bottom: var(--spacing-md);
+    border-bottom: 1px solid var(--color-rule);
   }
   .step-num {
-    flex-shrink: 0;
-    font-size: 1.25rem;
+    font-family: var(--font-display);
     color: var(--color-accent);
-    line-height: 1.2;
-    min-width: 2rem;
+    font-size: 1.25rem;
   }
-
-  @keyframes geo-drift {
-    from { transform: scale(1) translate(0, 0); }
-    to { transform: scale(1.04) translate(-1.5%, 1%); }
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes sun-pulse {
+    0%, 100% { transform: scale(1); opacity: 0.95; }
+    50% { transform: scale(1.04); opacity: 1; }
   }
 </style>
-
-<script>
-  function estimateFromBill(bill: number) {
-    // Rough: ~₹1,000/month ≈ 1 kW for coastal Andhra residential.
-    const kwRaw = Math.max(1, Math.min(10, bill / 1000));
-    const kw = Math.round(kwRaw * 2) / 2; // nearest 0.5
-    let subsidy = 0;
-    if (kw <= 2) subsidy = kw * 30000;
-    else if (kw <= 3) subsidy = 2 * 30000 + (kw - 2) * 18000;
-    else subsidy = 78000;
-    // Net cost rough: ~₹55k/kW after subsidy floor; payback vs annual bill.
-    const gross = kw * 55000;
-    const net = Math.max(gross - subsidy, gross * 0.35);
-    const annualSave = bill * 12 * 0.75;
-    const payback = annualSave > 0 ? Math.max(2, Math.round((net / annualSave) * 10) / 10) : 0;
-    return { kw, subsidy, payback };
-  }
-
-  function formatInr(n: number) {
-    return new Intl.NumberFormat('en-IN', {
-      style: 'currency',
-      currency: 'INR',
-      maximumFractionDigits: 0,
-    }).format(n);
-  }
-
-  function syncCalc(root: HTMLElement) {
-    const input = root.querySelector<HTMLInputElement>('[data-bill-input]');
-    const billDisplay = root.querySelector<HTMLElement>('[data-bill-display]');
-    const kwEl = root.querySelector<HTMLElement>('[data-calc-kw]');
-    const subEl = root.querySelector<HTMLElement>('[data-calc-subsidy]');
-    const payEl = root.querySelector<HTMLElement>('[data-calc-payback]');
-    if (!input || !billDisplay || !kwEl || !subEl || !payEl) return;
-
-    const update = () => {
-      const bill = Number(input.value) || 3000;
-      const { kw, subsidy, payback } = estimateFromBill(bill);
-      billDisplay.textContent = formatInr(bill);
-      kwEl.textContent = `~${kw} kW`;
-      subEl.textContent = formatInr(subsidy);
-      payEl.textContent = `~${payback} yrs`;
-    };
-
-    input.addEventListener('input', update);
-    update();
-  }
-
-  function initCalcs() {
-    document.querySelectorAll<HTMLElement>('[data-bill-calc]').forEach(syncCalc);
-  }
-
-  initCalcs();
-  document.addEventListener('astro:page-load', initCalcs);
-</script>

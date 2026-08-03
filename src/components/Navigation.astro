@@ -2,15 +2,15 @@
 ---
 <header class="site-nav" transition:persist="site-nav">
   <nav class="max-w-6xl mx-auto px-lg flex items-center justify-between gap-lg py-md">
-    <a href="/" class="site-brand flex items-center gap-sm min-w-0">
+    <a href="/" class="flex items-center gap-sm font-display text-lg tracking-tight no-underline text-ink">
       <img
         src="/brand/logo.jpeg"
-        alt=""
+        alt="Saanvika Solar Systems"
         width="40"
         height="40"
-        class="site-brand-logo"
+        class="brand-logo"
       />
-      <span class="font-display text-base md:text-lg tracking-tight truncate">Saanvika Solar Systems</span>
+      <span class="leading-tight">Saanvika Solar Systems</span>
     </a>
 
     <input type="checkbox" id="nav-toggle" class="peer hidden" aria-hidden="true" />
@@ -27,7 +27,7 @@
     <div
       class="hidden peer-checked:flex md:flex absolute md:static top-full left-0 right-0 md:right-auto
              flex-col md:flex-row gap-md md:gap-lg items-start md:items-center
-             bg-paper md:bg-transparent border-b md:border-0 border-rule px-lg md:px-0 py-md md:py-0"
+             bg-paper md:bg-transparent border-b md:border-0 border-rule px-lg md:px-0 py-md md:py-0 z-20"
     >
       <ul class="flex flex-col md:flex-row gap-md md:gap-lg items-start md:items-center">
         <li class="site-nav-item"><a href="/about">About</a></li>
@@ -36,9 +36,17 @@
         <!-- nav:links -->
         <li class="site-nav-item"><a href="/services">Services</a></li>
       </ul>
-      <div class="nav-actions">
-        <a href="/services/free-site-survey" class="btn-primary nav-cta">Book free survey</a>
+      <div class="nav-actions flex items-center gap-sm">
+        <a href="/services/free-site-survey" class="btn-primary text-sm py-sm px-md">Book free survey</a>
       </div>
     </div>
   </nav>
 </header>
+
+<style>
+  .brand-logo {
+    border-radius: 9999px;
+    object-fit: cover;
+    flex: none;
+  }
+</style>
