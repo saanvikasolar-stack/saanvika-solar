@@ -1,0 +1,27 @@
+---
+const year = new Date().getFullYear();
+---
+<footer class="site-footer" transition:persist="site-footer">
+  <div class="max-w-6xl mx-auto px-lg py-3xl flex flex-col md:flex-row md:items-start md:justify-between gap-xl">
+    <div class="flex flex-col gap-sm max-w-prose">
+      <a href="/" class="flex items-center gap-sm no-underline text-ink">
+        <img src="/brand/logo.jpeg" alt="" width="32" height="32" class="rounded-full object-cover" />
+        <span class="font-display text-lg text-ink">Saanvika Solar Systems</span>
+      </a>
+      <p class="text-sm">Born in Kakinada. Built for coastal Andhra homes.</p>
+      <p class="text-xs text-mute">APEPDCL net metering · PM Surya Ghar MNRE vendor · Godavari coast</p>
+    </div>
+    <nav>
+      <ul class="flex flex-col gap-sm text-sm">
+        <li><a href="/about">About</a></li>
+        <li><a href="/faq">FAQ</a></li>
+        <li><a href="/services">Services</a></li>
+        <li><a href="/contact">Contact</a></li>
+        <li><a href="/login" class="text-mute">Staff login</a></li>
+      </ul>
+    </nav>
+  </div>
+  <div class="max-w-6xl mx-auto px-lg pb-xl text-xs text-mute">
+    <p>© {year} Saanvika Solar Systems. All rights reserved.</p>
+  </div>
+</footer>

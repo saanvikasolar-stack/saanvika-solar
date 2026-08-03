@@ -1,0 +1,12 @@
+---
+import { resolveOpsAccess } from "../lib/ops-auth";
+
+const access = await resolveOpsAccess();
+if (access.status === "ok") {
+  return Astro.redirect("/ops/index.html", 302);
+}
+if (access.status === "not_staff") {
+  return Astro.redirect("/login?denied=1", 302);
+}
+return Astro.redirect("/login", 302);
+---
