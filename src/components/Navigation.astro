@@ -2,7 +2,16 @@
 ---
 <header class="site-nav" transition:persist="site-nav">
   <nav class="max-w-6xl mx-auto px-lg flex items-center justify-between gap-lg py-md">
-    <a href="/" class="font-display text-lg tracking-tight">Saanvika Solar Systems</a>
+    <a href="/" class="site-brand flex items-center gap-sm min-w-0">
+      <img
+        src="/brand/logo.jpeg"
+        alt=""
+        width="40"
+        height="40"
+        class="site-brand-logo"
+      />
+      <span class="font-display text-base md:text-lg tracking-tight truncate">Saanvika Solar Systems</span>
+    </a>
 
     <input type="checkbox" id="nav-toggle" class="peer hidden" aria-hidden="true" />
     <label
@@ -27,7 +36,9 @@
         <!-- nav:links -->
         <li class="site-nav-item"><a href="/services">Services</a></li>
       </ul>
-      <div class="nav-actions"></div>
+      <div class="nav-actions">
+        <a href="/services/free-site-survey" class="btn-primary nav-cta">Book free survey</a>
+      </div>
     </div>
   </nav>
 </header>
