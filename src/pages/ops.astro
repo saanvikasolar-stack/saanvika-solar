@@ -1,0 +1,10 @@
+---
+import { resolveOpsSession } from "../lib/ops-auth";
+
+const session = await resolveOpsSession();
+if (!session) {
+  return Astro.redirect("/login", 302);
+}
+// Authorized staff → the ops app (static UI talks to secured /api/ops/*)
+return Astro.redirect("/ops/index.html", 302);
+---

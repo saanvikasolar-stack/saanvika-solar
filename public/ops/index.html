@@ -626,22 +626,22 @@
       <div class="user-indicator">
         <span class="user-dot" aria-hidden="true"></span>
         <span id="currentUserLabel">—</span>
-        <button type="button" class="link-btn" id="btnSwitchUser">Switch</button>
+        <form method="POST" action="/api/auth/logout?returnToUrl=/login" style="display:inline;margin:0">
+          <button type="submit" class="link-btn" id="btnSwitchUser">Sign out</button>
+        </form>
       </div>
-      <div class="sync-indicator" id="syncIndicator"><span class="sync-dot"></span><span id="syncLabel">Local only</span></div>
-      <div class="hint" id="railHint">Data is stored in this browser only. Use Export to back up.</div>
+      <div class="sync-indicator" id="syncIndicator"><span class="sync-dot"></span><span id="syncLabel">Securing…</span></div>
+      <div class="hint" id="railHint">Data is encrypted in transit and stored on Wix (ADMIN-only). Export for offline backup.</div>
       <div id="staffAdminPanel" style="display:none;margin-top:12px;text-align:left">
-        <div class="hint" style="font-weight:700;margin-bottom:6px">Staff accounts</div>
+        <div class="hint" style="font-weight:700;margin-bottom:6px">Invite staff by email</div>
         <div id="staffAdminList"></div>
         <div style="margin-top:10px;display:grid;gap:6px">
           <input class="auth-input" id="newStaffName" placeholder="Full name">
-          <input class="auth-input" id="newStaffUser" placeholder="Username">
-          <input class="auth-input" id="newStaffPass" type="password" placeholder="Password">
+          <input class="auth-input" id="newStaffEmail" type="email" placeholder="Work email" autocomplete="off">
           <select class="auth-input" id="newStaffRole">
             <option value="staff">Staff (edit)</option>
-            <option value="monitor">Monitor-only</option>
           </select>
-          <button type="button" class="auth-btn" id="btnAddStaff" style="width:100%">Add staff</button>
+          <button type="button" class="auth-btn" id="btnAddStaff" style="width:100%">Send invite</button>
         </div>
       </div>
 
@@ -655,15 +655,10 @@
         <div class="auth-brand-text"><span class="name">Saanvika Solar Systems</span><span class="sub">Staff login</span></div>
       </div>
       <div id="authStepLogin">
-        <h2>Sign in</h2>
-        <p class="auth-hint">Individual login for you and your team. Owner can add more staff from Settings.</p>
-        <label class="auth-label" for="authUserInput">Username</label>
-        <input type="text" id="authUserInput" class="auth-input" placeholder="Username" autocomplete="username">
-        <label class="auth-label" for="authPassInput">Password</label>
-        <input type="password" id="authPassInput" class="auth-input" placeholder="Password" autocomplete="current-password">
-        <div class="auth-error" id="authLoginError" style="display:none">Wrong username or password.</div>
-        <button type="button" class="auth-btn" id="authLoginBtn">Sign in</button>
-        <p class="auth-hint" style="margin-top:14px">Default owner: <code>sai.vinod</code> / <code>Saanvika@Owner1</code></p>
+        <h2>Checking access…</h2>
+        <p class="auth-hint">Verifying your Wix staff session. Passwords are never stored in this browser.</p>
+        <div class="auth-error" id="authLoginError" style="display:none">You are not on the staff allowlist.</div>
+        <a class="auth-btn" id="authLoginBtn" href="/login" style="display:block;text-align:center;text-decoration:none">Go to secure sign-in</a>
       </div>
     </div>
   </div>
@@ -949,43 +944,23 @@
   /* Everything from here on lives in the Service tab, not the main Projects list. */
   var SERVICE_STAGES = ["Service","Service Completed"];
   var TEAMS = ["Unassigned","Mahesh Team","Sri Hari Team","Satish Team"];
-  var STORAGE_KEY = "saanvika-solar-dashboard-v1";
   var SETTINGS_KEY = "saanvika-solar-dashboard-settings-v1";
-  var IDENTITY_KEY = "saanvika-solar-dashboard-identity-v1";
+  /* Purge legacy insecure keys (plaintext passwords / old session / Sheets sync secrets). */
+  try {
+    ["saanvika-solar-dashboard-v1","saanvika-solar-dashboard-identity-v1","saanvika.ops.users.v1","saanvika.ops.session.v1"].forEach(function(k){
+      localStorage.removeItem(k);
+    });
+  } catch(e){}
 
-  /* Shared front-door passcode — this only stops a casual stranger who stumbles
-     on the link; it runs in the page's own code, so it's not real security
-     against someone determined enough to view source. Change it here (and tell
-     your 4 people) if it ever needs to rotate. */
-
-  var USERS_KEY = "saanvika.ops.users.v1";
-  var SESSION_KEY = "saanvika.ops.session.v1";
-  var DEFAULT_USERS = [
-    { id:"u-owner", username:"sai.vinod", name:"Sai Vinod Boddu", role:"owner", password:"Saanvika@Owner1" },
-    { id:"u-staff1", username:"prem", name:"Prem Kumar", role:"staff", password:"Saanvika@Staff1" },
-    { id:"u-staff2", username:"rohit", name:"Rohit", role:"staff", password:"Saanvika@Staff2" }
-  ];
-  function loadUsers(){
-    try {
-      var raw = localStorage.getItem(USERS_KEY);
-      if (raw) { var u = JSON.parse(raw); if (Array.isArray(u) && u.length) return u; }
-    } catch(e){}
-    localStorage.setItem(USERS_KEY, JSON.stringify(DEFAULT_USERS));
-    return DEFAULT_USERS.slice();
-  }
-  function saveUsers(users){ try { localStorage.setItem(USERS_KEY, JSON.stringify(users)); } catch(e){} }
-  function loadSession(){ try { var raw = localStorage.getItem(SESSION_KEY); return raw ? JSON.parse(raw) : null; } catch(e){ return null; } }
-  function saveSession(session){ try { if (session) localStorage.setItem(SESSION_KEY, JSON.stringify(session)); else localStorage.removeItem(SESSION_KEY); } catch(e){} }
+  var serverSession = null;
+  var staffCache = [];
+  var saveTimer = null;
   var PASSCODE = "UNUSED";
 
-
-  /* Paste your deployed Google Apps Script Web App /exec URL below to share
-     one live dataset across every device that opens this dashboard. Leave
-     blank to keep data local to this browser only. SYNC_KEY must match the
-     SECRET constant in the Apps Script so a bare, leaked URL alone can't be
-     used to read or write your data. */
-  var SYNC_URL = "https://script.google.com/macros/s/AKfycbxCVtCnbGPKZfJkx41pHhyDpLrba1cF197qCTSER51mG-dWwMg_9x_eRePIV6DzBGpV/exec";
-  var SYNC_KEY = "BcwEx3O71I1BddnhhHhYDvbbpXA3cpK";
+  /* Google Apps Script sync removed — secrets must never live in frontend JS.
+     Team data now syncs through authenticated /api/ops/data on Wix. */
+  var SYNC_URL = "";
+  var SYNC_KEY = "";
 
   function uid(){ return (crypto.randomUUID ? crypto.randomUUID() : "id-"+Date.now()+"-"+Math.random().toString(16).slice(2)); }
   function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
@@ -1040,26 +1015,47 @@
     });
   }
 
-  function load(){
-    try {
-      var raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) {
-        var parsed = JSON.parse(raw);
-        state.leads = parsed.leads || [];
-        state.projects = parsed.projects || [];
-        state.complaints = parsed.complaints || [];
-        state.inventory = parsed.inventory || [];
-        state.agents = parsed.agents || [];
-        state.dispatches = parsed.dispatches || [];
-      }
-    } catch(e){ console.error("Failed to load saved data", e); }
+  function applyPayload(payload){
+    state.leads = (payload && payload.leads) || [];
+    state.projects = (payload && payload.projects) || [];
+    state.complaints = (payload && payload.complaints) || [];
+    state.inventory = (payload && payload.inventory) || [];
+    state.agents = (payload && payload.agents) || [];
+    state.dispatches = (payload && payload.dispatches) || [];
     migrateProjectStages();
     recomputeView();
   }
-  function save(){
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
-    catch(e){ toast("Could not save — storage may be full."); }
+
+  function load(){
+    /* async load happens in bootSecure(); keep sync stub for call sites */
   }
+
+  function save(){
+    if (!serverSession) return;
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(function(){
+      setSyncStatus("syncing");
+      fetch("/api/ops/data", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
+        body: JSON.stringify({
+          payload: {
+            leads: state.leads,
+            projects: state.projects,
+            complaints: state.complaints,
+            inventory: state.inventory,
+            agents: state.agents,
+            dispatches: state.dispatches
+          }
+        })
+      })
+      .then(function(res){ if (!res.ok) throw new Error("save failed"); return res.json(); })
+      .then(function(){ setSyncStatus("synced"); })
+      .catch(function(){ setSyncStatus("error"); toast("Could not save to secure store."); });
+    }, 450);
+  }
+
   function loadSettings(){
     try {
       var raw = localStorage.getItem(SETTINGS_KEY);
@@ -1069,15 +1065,8 @@
   function saveSettings(){
     try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings)); } catch(e){}
   }
-  function loadIdentity(){
-    try {
-      var raw = localStorage.getItem(IDENTITY_KEY);
-      if (raw) { var parsed = JSON.parse(raw); identity.unlocked = !!parsed.unlocked; identity.user = parsed.user || ""; }
-    } catch(e){}
-  }
-  function saveIdentity(){
-    try { localStorage.setItem(IDENTITY_KEY, JSON.stringify(identity)); } catch(e){}
-  }
+  function loadIdentity(){ /* identity comes from server session */ }
+  function saveIdentity(){ /* no-op — never persist identity client-side */ }
 
   function toast(msg){
     var wrap = document.getElementById("toastWrap");
@@ -1164,12 +1153,8 @@
 
   function startSync(){
     var hint = document.getElementById("railHint");
-    if (!SYNC_URL) { setSyncStatus(""); if (hint) hint.textContent = "Data is stored in this browser only. Use Export to back up."; return; }
-    if (hint) hint.textContent = "Shared live with your team via Google Sheets.";
-    syncPull();
-    setInterval(syncPull, 25000);
-    document.addEventListener("visibilitychange", function(){ if (!document.hidden) syncPull(); });
-    window.addEventListener("focus", syncPull);
+    if (hint) hint.textContent = "Live team data on Wix (HTTPS). Export anytime for offline backup.";
+    setSyncStatus("synced", "Synced securely");
   }
 
   /* ---------- nav ---------- */
@@ -3261,107 +3246,151 @@
     toast(settings.readOnly ? "Switched to monitor-only view on this device." : "Editing enabled on this device.");
   });
 
-  /* ---------- access gate: individual staff logins ---------- */
-  var users = loadUsers();
-  var session = loadSession();
-
-  function showGate(){
+  /* ---------- access gate: Wix member session + staff allowlist ---------- */
+  function showGate(msg){
     document.getElementById("authGate").style.display = "flex";
-    var u = document.getElementById("authUserInput");
-    if (u) u.focus();
+    var err = document.getElementById("authLoginError");
+    var title = document.querySelector("#authStepLogin h2");
+    if (title) title.textContent = "Sign in required";
+    if (msg) {
+      err.style.display = "block";
+      err.textContent = msg;
+    }
   }
   function hideGate(){
     document.getElementById("authGate").style.display = "none";
   }
   function currentUser(){
-    if (!session || !session.userId) return null;
-    return users.find(function(u){ return u.id === session.userId; }) || null;
+    if (!serverSession) return null;
+    return {
+      id: serverSession.staffId,
+      name: serverSession.name,
+      email: serverSession.email,
+      role: serverSession.role
+    };
   }
-  function checkGate(){
+  function applySessionUI(){
     var user = currentUser();
-    if (!user) { showGate(); return; }
+    if (!user) { showGate("You are not signed in."); return; }
     identity.unlocked = true;
     identity.user = user.name;
-    saveIdentity();
     document.getElementById("currentUserLabel").textContent = user.name + (user.role === "owner" ? " · Owner" : "");
-    settings.readOnly = (user.role === "monitor");
-    saveSettings(); applySettingsUI();
     var staffPanel = document.getElementById("staffAdminPanel");
     if (staffPanel) staffPanel.style.display = user.role === "owner" ? "block" : "none";
     if (user.role === "owner") renderStaffAdmin();
     hideGate();
     renderAll();
   }
-  function submitLogin(){
-    var username = (document.getElementById("authUserInput").value || "").trim().toLowerCase();
-    var password = document.getElementById("authPassInput").value || "";
-    users = loadUsers();
-    var match = users.find(function(u){ return u.username.toLowerCase() === username && u.password === password; });
-    if (match) {
-      session = { userId: match.id, at: Date.now() };
-      saveSession(session);
-      document.getElementById("authLoginError").style.display = "none";
-      document.getElementById("authPassInput").value = "";
-      checkGate();
-    } else {
-      document.getElementById("authLoginError").style.display = "block";
-    }
-  }
-  document.getElementById("authLoginBtn").addEventListener("click", submitLogin);
-  document.getElementById("authPassInput").addEventListener("keydown", function(e){ if (e.key === "Enter") submitLogin(); });
-  document.getElementById("authUserInput").addEventListener("keydown", function(e){ if (e.key === "Enter") submitLogin(); });
-  document.getElementById("btnSwitchUser").addEventListener("click", function(){
-    saveSession(null); session = null;
-    identity.user = ""; identity.unlocked = false; saveIdentity();
-    showGate();
-  });
 
   function renderStaffAdmin(){
     var box = document.getElementById("staffAdminList");
     if (!box) return;
-    users = loadUsers();
-    box.innerHTML = users.map(function(u){
+    if (!staffCache.length) {
+      box.innerHTML = '<div class="meta">Loading staff…</div>';
+      fetch("/api/ops/staff", { credentials: "same-origin", cache: "no-store" })
+        .then(function(r){ return r.json(); })
+        .then(function(data){
+          if (!data.ok) throw new Error("fail");
+          staffCache = data.staff || [];
+          renderStaffAdmin();
+        })
+        .catch(function(){ box.innerHTML = '<div class="meta">Could not load staff list.</div>'; });
+      return;
+    }
+    box.innerHTML = staffCache.filter(function(u){ return u.active !== false; }).map(function(u){
       var canDelete = u.role !== "owner";
-      return '<div class="staff-row"><div><strong>'+esc(u.name)+'</strong><div class="meta">@'+esc(u.username)+' · '+esc(u.role)+'</div></div>'
+      return '<div class="staff-row"><div><strong>'+esc(u.name)+'</strong><div class="meta">'+esc(u.email)+' · '+esc(u.role)+'</div></div>'
         + (canDelete ? '<button type="button" class="btn ghost" data-del-user="'+esc(u.id)+'">Remove</button>' : '<span class="meta">Protected</span>')
         + '</div>';
-    }).join("");
+    }).join("") || '<div class="meta">No staff yet.</div>';
   }
+
   function addStaffUser(){
     var name = (document.getElementById("newStaffName").value || "").trim();
-    var username = (document.getElementById("newStaffUser").value || "").trim().toLowerCase();
-    var password = document.getElementById("newStaffPass").value || "";
+    var email = (document.getElementById("newStaffEmail").value || "").trim().toLowerCase();
     var role = document.getElementById("newStaffRole").value || "staff";
-    if (!name || !username || !password) { alert("Name, username, and password are required."); return; }
-    users = loadUsers();
-    if (users.some(function(u){ return u.username.toLowerCase() === username; })) { alert("Username already exists."); return; }
-    users.push({ id: uid(), username: username, name: name, role: role, password: password });
-    saveUsers(users);
-    document.getElementById("newStaffName").value = "";
-    document.getElementById("newStaffUser").value = "";
-    document.getElementById("newStaffPass").value = "";
-    renderStaffAdmin();
+    if (!name || !email) { alert("Name and work email are required."); return; }
+    var btn = document.getElementById("btnAddStaff");
+    if (btn) { btn.disabled = true; btn.textContent = "Sending…"; }
+    fetch("/api/ops/staff", {
+      method: "POST",
+      credentials: "same-origin",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: name, email: email, role: role })
+    })
+    .then(function(r){ return r.json().then(function(d){ return { ok: r.ok, d: d }; }); })
+    .then(function(res){
+      if (!res.ok || !res.d.ok) throw new Error((res.d && res.d.error) || "Invite failed");
+      staffCache = [];
+      document.getElementById("newStaffName").value = "";
+      document.getElementById("newStaffEmail").value = "";
+      renderStaffAdmin();
+      toast(res.d.passwordEmailSent
+        ? "Invite sent — they got a set-password email from Wix."
+        : "Staff added. Ask them to sign in via /login (they may need a password reset email).");
+    })
+    .catch(function(err){ alert(err.message || "Invite failed"); })
+    .finally(function(){ if (btn) { btn.disabled = false; btn.textContent = "Send invite"; } });
   }
+
   document.addEventListener("click", function(e){
     var del = e.target.closest("[data-del-user]");
     if (del) {
       var id = del.getAttribute("data-del-user");
-      users = loadUsers().filter(function(u){ return u.id !== id; });
-      saveUsers(users); renderStaffAdmin();
+      if (!confirm("Remove this staff member from the allowlist?")) return;
+      fetch("/api/ops/staff", {
+        method: "DELETE",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ staffId: id })
+      })
+      .then(function(r){ return r.json(); })
+      .then(function(d){
+        if (!d.ok) throw new Error(d.error || "Remove failed");
+        staffCache = [];
+        renderStaffAdmin();
+        toast("Staff removed.");
+      })
+      .catch(function(err){ alert(err.message || "Remove failed"); });
     }
     if (e.target && e.target.id === "btnAddStaff") addStaffUser();
   });
 
+  function bootSecure(){
+    showGate();
+    fetch("/api/ops/session", { credentials: "same-origin", cache: "no-store" })
+      .then(function(r){ return r.json().then(function(d){ return { status: r.status, d: d }; }); })
+      .then(function(res){
+        if (!res.d.ok || !res.d.session) {
+          window.location.href = "/login";
+          return null;
+        }
+        serverSession = res.d.session;
+        return fetch("/api/ops/data", { credentials: "same-origin", cache: "no-store" });
+      })
+      .then(function(r){
+        if (!r) return null;
+        return r.json();
+      })
+      .then(function(data){
+        if (!data) return;
+        if (!data.ok) { window.location.href = "/login"; return; }
+        applyPayload(data.payload || {});
+        applySettingsUI();
+        applySessionUI();
+        startSync();
+      })
+      .catch(function(){
+        showGate("Could not reach the secure API. Try signing in again.");
+      });
+  }
+
   /* ---------- init ---------- */
   document.getElementById("todayStr").textContent = new Date().toLocaleDateString(undefined, { weekday:"long", year:"numeric", month:"long", day:"numeric" });
-  load();
   loadSettings();
-  loadIdentity();
   applySettingsUI();
-  checkGate();
   document.getElementById("view-today").classList.add("active");
-  renderAll();
-  startSync();
+  bootSecure();
 })();
 </script>
 
