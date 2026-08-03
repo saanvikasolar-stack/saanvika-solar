@@ -1,9 +1,9 @@
 ---
-import { resolveOpsSession } from "../lib/ops-auth";
+import { resolveOpsAccess } from "../lib/ops-auth";
 
-const session = await resolveOpsSession();
-if (session) {
-  return Astro.redirect("/ops", 302);
+const access = await resolveOpsAccess();
+if (access.status === "ok") {
+  return Astro.redirect("/ops/index.html", 302);
 }
 return Astro.redirect("/login", 302);
 ---

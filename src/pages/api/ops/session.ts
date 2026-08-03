@@ -1,5 +1,5 @@
 import type { APIRoute } from "astro";
-import { resolveOpsSession } from "../../../lib/ops-auth";
+import { resolveOpsAccess } from "../../../lib/ops-auth";
 
 const json = (status: number, body: Record<string, unknown>) =>
   new Response(JSON.stringify(body), {
@@ -8,21 +8,29 @@ const json = (status: number, body: Record<string, unknown>) =>
   });
 
 export const GET: APIRoute = async () => {
-  const session = await resolveOpsSession();
-  if (!session) {
-    return json(401, {
-      ok: false,
-      error: "unauthorized",
-      loginUrl: "/api/auth/login?returnToUrl=/ops",
+  const access = await resolveOpsAccess();
+  if (access.status === "ok") {
+    return json(200, {
+      ok: true,
+      session: {
+        name: access.session.name,
+        email: access.session.email,
+        role: access.session.role,
+        staffId: access.session.staffId,
+      },
     });
   }
-  return json(200, {
-    ok: true,
-    session: {
-      name: session.name,
-      email: session.email,
-      role: session.role,
-      staffId: session.staffId,
-    },
+  if (access.status === "not_staff") {
+    return json(403, {
+      ok: false,
+      error: "not_staff",
+      email: access.email,
+      loginUrl: "/login",
+    });
+  }
+  return json(401, {
+    ok: false,
+    error: "unauthorized",
+    loginUrl: "/api/auth/login?returnToUrl=/ops/index.html",
   });
 };

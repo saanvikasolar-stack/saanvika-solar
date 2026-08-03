@@ -29,23 +29,22 @@ function normalizeEmail(email: string | undefined | null): string {
     .toLowerCase();
 }
 
+function memberIdOf(member: any): string {
+  return String(member?._id || member?.id || "");
+}
+
 export async function getCurrentMemberSafe() {
   try {
     const res = await members.getCurrentMember({ fieldsets: ["FULL"] as any });
-    return res.member ?? null;
+    if ((res as any)?.member) return (res as any).member;
+    if ((res as any)?._id || (res as any)?.id) return res as any;
+    return null;
   } catch {
     return null;
   }
 }
 
-async function queryStaffByEmail(email: string): Promise<OpsStaffRecord | null> {
-  const elevatedQuery = auth.elevate(items.query);
-  const { items: rows } = await elevatedQuery(STAFF_COLLECTION)
-    .eq("email", email)
-    .limit(5)
-    .find();
-  const row = rows.find((r: any) => r.active !== false) ?? rows[0];
-  if (!row) return null;
+function mapStaffRow(row: any): OpsStaffRecord {
   return {
     _id: String(row._id),
     email: normalizeEmail(row.email as string),
@@ -54,64 +53,112 @@ async function queryStaffByEmail(email: string): Promise<OpsStaffRecord | null> 
     active: row.active !== false,
     memberId: row.memberId ? String(row.memberId) : undefined,
   };
+}
+
+async function queryStaffByEmail(email: string): Promise<OpsStaffRecord | null> {
+  try {
+    const elevatedQuery = auth.elevate(items.query);
+    const { items: rows } = await elevatedQuery(STAFF_COLLECTION)
+      .eq("email", email)
+      .limit(20)
+      .find();
+    const row = rows.find((r: any) => r.active !== false) ?? rows[0];
+    return row ? mapStaffRow(row) : null;
+  } catch (err) {
+    console.error("[ops-auth] staff-by-email query failed", err);
+    return null;
+  }
 }
 
 async function queryStaffByMemberId(memberId: string): Promise<OpsStaffRecord | null> {
-  const elevatedQuery = auth.elevate(items.query);
-  const { items: rows } = await elevatedQuery(STAFF_COLLECTION)
-    .eq("memberId", memberId)
-    .limit(5)
-    .find();
-  const row = rows.find((r: any) => r.active !== false) ?? rows[0];
-  if (!row) return null;
-  return {
-    _id: String(row._id),
-    email: normalizeEmail(row.email as string),
-    name: String(row.name || ""),
-    role: (row.role === "owner" ? "owner" : "staff") as OpsRole,
-    active: row.active !== false,
-    memberId: row.memberId ? String(row.memberId) : undefined,
-  };
+  try {
+    const elevatedQuery = auth.elevate(items.query);
+    const { items: rows } = await elevatedQuery(STAFF_COLLECTION)
+      .eq("memberId", memberId)
+      .limit(20)
+      .find();
+    const row = rows.find((r: any) => r.active !== false) ?? rows[0];
+    return row ? mapStaffRow(row) : null;
+  } catch (err) {
+    console.error("[ops-auth] staff-by-memberId query failed", err);
+    return null;
+  }
 }
 
-/** Resolve logged-in Wix member → allowlisted Ops staff. Anonymous / non-staff → null. */
-export async function resolveOpsSession(): Promise<OpsSession | null> {
+export type OpsAccessResult =
+  | { status: "ok"; session: OpsSession }
+  | { status: "anonymous" }
+  | { status: "not_staff"; email?: string; name?: string };
+
+/** Resolve logged-in Wix member → allowlisted Ops staff, with clear denial reason. */
+export async function resolveOpsAccess(): Promise<OpsAccessResult> {
   const member = await getCurrentMemberSafe();
-  if (!member?.id) return null;
+  const memberId = memberIdOf(member);
+  if (!member || !memberId) return { status: "anonymous" };
 
   const email = normalizeEmail(member.loginEmail);
   let staff =
-    (await queryStaffByMemberId(member.id)) ||
+    (await queryStaffByMemberId(memberId)) ||
     (email ? await queryStaffByEmail(email) : null);
 
-  if (!staff || !staff.active) return null;
+  // Fallback: scan staff list (small allowlist) if equality filters miss.
+  if (!staff) {
+    try {
+      const all = await listOpsStaff();
+      staff =
+        all.find((s) => s.active && (s.memberId === memberId || (email && s.email === email))) ||
+        null;
+    } catch (err) {
+      console.error("[ops-auth] staff list fallback failed", err);
+    }
+  }
+
+  if (!staff || !staff.active) {
+    return {
+      status: "not_staff",
+      email: email || undefined,
+      name: member.profile?.nickname || undefined,
+    };
+  }
 
   // Backfill memberId when staff was invited by email before first login.
   if (!staff.memberId && email) {
     try {
       const elevatedUpdate = auth.elevate(items.update);
       await elevatedUpdate(STAFF_COLLECTION, {
-        ...staff,
+        email: staff.email,
+        name: staff.name,
+        role: staff.role,
+        active: staff.active,
         _id: staff._id,
-        memberId: member.id,
+        memberId,
       } as any);
-      staff = { ...staff, memberId: member.id };
+      staff = { ...staff, memberId };
     } catch (err) {
       console.warn("[ops-auth] memberId backfill failed", err);
     }
   }
 
   return {
-    memberId: member.id,
-    email: staff.email || email,
-    name:
-      staff.name ||
-      member.profile?.nickname ||
-      [member.contact?.firstName, member.contact?.lastName].filter(Boolean).join(" ") ||
-      email,
-    role: staff.role,
-    staffId: staff._id,
+    status: "ok",
+    session: {
+      memberId,
+      email: staff.email || email,
+      name:
+        staff.name ||
+        member.profile?.nickname ||
+        [member.contact?.firstName, member.contact?.lastName].filter(Boolean).join(" ") ||
+        email,
+      role: staff.role,
+      staffId: staff._id,
+    },
   };
+}
+
+/** Resolve logged-in Wix member → allowlisted Ops staff. Anonymous / non-staff → null. */
+export async function resolveOpsSession(): Promise<OpsSession | null> {
+  const access = await resolveOpsAccess();
+  return access.status === "ok" ? access.session : null;
 }
 
 export async function listOpsStaff(): Promise<OpsStaffRecord[]> {

@@ -3362,7 +3362,7 @@
       .then(function(r){ return r.json().then(function(d){ return { status: r.status, d: d }; }); })
       .then(function(res){
         if (!res.d.ok || !res.d.session) {
-          window.location.href = "/login";
+          window.location.href = res.status === 403 ? "/login?denied=1" : "/login";
           return null;
         }
         serverSession = res.d.session;

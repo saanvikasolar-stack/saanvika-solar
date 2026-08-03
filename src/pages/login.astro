@@ -1,10 +1,13 @@
 ---
-import { resolveOpsSession } from "../lib/ops-auth";
+import { resolveOpsAccess } from "../lib/ops-auth";
 
-const session = await resolveOpsSession();
-if (session) {
+const access = await resolveOpsAccess();
+if (access.status === "ok") {
   return Astro.redirect("/ops/index.html", 302);
 }
+
+const denied = Astro.url.searchParams.get("denied") === "1" || access.status === "not_staff";
+const signedInEmail = access.status === "not_staff" ? access.email : undefined;
 ---
 <!DOCTYPE html>
 <html lang="en">
@@ -23,8 +26,6 @@ if (session) {
       --muted: #4d6356;
       --leaf: #1f6b45;
       --leaf-deep: #0f3d28;
-      --sand: #e8f0ea;
-      --sun: #f0b429;
     }
     * { box-sizing: border-box; }
     body {
@@ -86,6 +87,15 @@ if (session) {
       line-height: 1.5;
       font-size: 0.98rem;
     }
+    .warn {
+      margin: 0 0 18px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: #fff4e5;
+      color: #6a3b00;
+      font-size: 0.92rem;
+      line-height: 1.45;
+    }
     .cta {
       display: block;
       width: 100%;
@@ -96,13 +106,9 @@ if (session) {
       font-weight: 700;
       padding: 14px 18px;
       border-radius: 12px;
-      border: none;
-      cursor: pointer;
       font-size: 1rem;
-      transition: transform 0.15s ease, box-shadow 0.15s ease;
       box-shadow: 0 10px 24px rgba(15,61,40,0.22);
     }
-    .cta:hover { transform: translateY(-1px); }
     .note {
       margin: 18px 0 0;
       font-size: 0.85rem;
@@ -110,19 +116,12 @@ if (session) {
       line-height: 1.45;
     }
     .note strong { color: var(--ink); }
-    .locks {
-      margin-top: 22px;
-      padding-top: 18px;
-      border-top: 1px solid rgba(20,35,26,0.08);
-      display: grid;
-      gap: 10px;
-      font-size: 0.82rem;
+    .secondary {
+      display: block;
+      margin-top: 12px;
+      text-align: center;
       color: var(--muted);
-    }
-    .locks span { display: flex; gap: 8px; align-items: flex-start; }
-    .dot {
-      width: 8px; height: 8px; border-radius: 50%;
-      background: var(--leaf); margin-top: 5px; flex: none;
+      font-size: 0.9rem;
     }
   </style>
 </head>
@@ -135,21 +134,35 @@ if (session) {
         <p>Staff operations · Kakinada</p>
       </div>
     </div>
-    <h2>Secure staff sign-in</h2>
-    <p class="lead">
-      Customer and project data stays on Wix with encrypted member passwords —
-      not in the browser. Only people on your staff list can open the dashboard.
-    </p>
-    <a class="cta" href="/api/auth/login?returnToUrl=/ops">Sign in with Wix</a>
-    <p class="note">
-      First time? Check <strong>boddu.vinod789@gmail.com</strong> for a set-password email from Wix,
-      then sign in here. Owner can invite Prem, Rohit, and others by email from inside the dashboard.
-    </p>
-    <div class="locks">
-      <span><i class="dot"></i> HTTPS + Wix-managed member sessions (HttpOnly cookies)</span>
-      <span><i class="dot"></i> Ops data in ADMIN-only CMS — never public, never in plaintext passwords</span>
-      <span><i class="dot"></i> Staff allowlist by email — random sign-ups cannot see your data</span>
-    </div>
+    <h2>{denied ? "Signed in — access pending" : "Secure staff sign-in"}</h2>
+    {denied ? (
+      <p class="warn">
+        Wix recognized you{signedInEmail ? ` (${signedInEmail})` : ""}, but that account is not on the ops staff allowlist yet.
+        Owner email must be <strong>boddu.vinod789@gmail.com</strong>.
+      </p>
+    ) : (
+      <p class="lead">
+        Use your Wix member login (email + password, or Google if offered).
+        After sign-in you land in the secure ops dashboard.
+      </p>
+    )}
+    <a class="cta" href="/api/auth/login?returnToUrl=/ops/index.html">
+      {denied ? "Try a different account" : "Sign in with Wix"}
+    </a>
+    {!denied && (
+      <p class="note">
+        First time: check <strong>boddu.vinod789@gmail.com</strong> for a Wix “set password” email,
+        set a password, then sign in here. Prefer <strong>Sign in with Google</strong> if you see it —
+        that matches the owner account already.
+      </p>
+    )}
+    {denied && (
+      <form class="secondary" method="POST" action="/api/auth/logout?returnToUrl=/login">
+        <button type="submit" style="background:none;border:none;color:inherit;text-decoration:underline;cursor:pointer;font:inherit">
+          Sign out and try again
+        </button>
+      </form>
+    )}
   </main>
 </body>
 </html>
