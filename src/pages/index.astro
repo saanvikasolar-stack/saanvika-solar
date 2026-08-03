@@ -214,7 +214,7 @@ const getDuration = (s: any): number => s.schedule?.availabilityConstraints?.ses
 </Layout>
 
 <script>
-  function subsidyForKw(kw: number) {
+  function subsidyForKw(kw) {
     if (kw <= 0) return 0;
     const first = Math.min(kw, 2) * 30000;
     const next = Math.min(Math.max(kw - 2, 0), 1) * 18000;
@@ -222,7 +222,7 @@ const getDuration = (s: any): number => s.schedule?.availabilityConstraints?.ses
   }
 
   function updateCalc() {
-    const input = document.getElementById('billRange') as HTMLInputElement | null;
+    const input = document.getElementById('billRange');
     if (!input) return;
     const bill = Number(input.value);
     const kw = Math.max(1, Math.min(10, Math.round((bill / 1400) * 10) / 10));
@@ -235,14 +235,14 @@ const getDuration = (s: any): number => s.schedule?.availabilityConstraints?.ses
     const estKw = document.getElementById('estKw');
     const estSubsidy = document.getElementById('estSubsidy');
     const estPayback = document.getElementById('estPayback');
-    if (billValue) billValue.textContent = `₹${bill.toLocaleString('en-IN')} / month`;
-    if (estKw) estKw.textContent = `${kw} kW`;
-    if (estSubsidy) estSubsidy.textContent = `₹${subsidy.toLocaleString('en-IN')}`;
-    if (estPayback) estPayback.textContent = `~${payback} yrs`;
+    if (billValue) billValue.textContent = '₹' + bill.toLocaleString('en-IN') + ' / month';
+    if (estKw) estKw.textContent = kw + ' kW';
+    if (estSubsidy) estSubsidy.textContent = '₹' + subsidy.toLocaleString('en-IN');
+    if (estPayback) estPayback.textContent = '~' + payback + ' yrs';
   }
 
   const range = document.getElementById('billRange');
-  range?.addEventListener('input', updateCalc);
+  if (range) range.addEventListener('input', updateCalc);
   updateCalc();
 </script>
 
