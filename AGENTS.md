@@ -23,6 +23,8 @@ pip install -r requirements-dev.txt
 pip install -e .
 ```
 
+If `python3 -m venv` fails on Ubuntu, install `python3.12-venv` via apt first.
+
 The VM update script runs `pip install` only; activate the venv before running commands, or invoke tools via `.venv/bin/python` / `.venv/bin/assistant`.
 
 ### Lint and test
