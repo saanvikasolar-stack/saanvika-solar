@@ -1,0 +1,43 @@
+---
+// ServiceCard.astro — static card for the services listing grid.
+interface Props {
+  id: string;
+  slug: string;
+  name: string;
+  tagLine?: string;
+  durationMinutes: number;
+  price?: string;
+  currency?: string;
+  imageUrl?: string;
+  type: "APPOINTMENT" | "CLASS";
+}
+
+const { slug, name, tagLine, durationMinutes, price, imageUrl } = Astro.props;
+const isFree = slug === "free-site-survey" || price === "Free";
+---
+
+<a href={`/services/${slug}`} class:list={["service-card", isFree && "service-card--featured"]}>
+  {
+    imageUrl ? (
+      <div class="service-card-image">
+        <img src={imageUrl} alt={name} loading="lazy" />
+      </div>
+    ) : (
+      <div
+        class="service-card-image service-card-image--placeholder"
+        aria-hidden="true"
+        style="background-color: var(--color-paper-warm, var(--color-cream));"
+      />
+    )
+  }
+
+  <div class="service-card-meta">
+    {isFree && <p class="service-card-tagline text-accent font-medium">Start here — no charge</p>}
+    <h3 class="service-card-name">{name}</h3>
+    {tagLine && <p class="service-card-tagline">{tagLine}</p>}
+    <div class="service-card-price">
+      <span>{durationMinutes} min</span>
+      {price && <span>{price}</span>}
+    </div>
+  </div>
+</a>

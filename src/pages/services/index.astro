@@ -1,0 +1,74 @@
+---
+// SSR services listing — Free Site Survey sorted first for Kakinada homeowners.
+import Layout from "../../layouts/Layout.astro";
+import ServiceCard from "../../components/ServiceCard.astro";
+import { services } from "@wix/bookings";
+import { auth } from "@wix/essentials";
+
+let serviceList: any[] = [];
+try {
+  const result = await auth.elevate(services.queryServices)().limit(100).find();
+  serviceList = (result.items ?? []).filter((s: any) => !s.hidden);
+} catch (err) {
+  console.error("[services] listing query failed:", err);
+}
+
+const getSlug = (s: any): string => s.mainSlug?.name ?? s.supportedSlugs?.[0]?.name ?? s._id;
+
+const formatPrice = (s: any): string | undefined => {
+  const p = s.payment;
+  if (!p || p.rateType === "NO_FEE") return "Free";
+  if (p.rateType === "FIXED" && p.fixed?.price) {
+    const { value, currency } = p.fixed.price;
+    if (!value || Number(value) === 0) return "Free";
+    return new Intl.NumberFormat("en-IN", { style: "currency", currency: currency ?? "INR" }).format(Number(value));
+  }
+  return undefined;
+};
+
+const getDuration = (s: any): number => s.schedule?.availabilityConstraints?.sessionDurations?.[0] ?? 60;
+
+// Free Site Survey first — primary CTA for rooftop solar in Kakinada.
+serviceList = [...serviceList].sort((a, b) => {
+  const rank = (s: any) => {
+    const slug = getSlug(s);
+    if (slug === "free-site-survey") return 0;
+    if (s.payment?.rateType === "NO_FEE") return 1;
+    return 2;
+  };
+  return rank(a) - rank(b);
+});
+---
+
+<Layout title="Services" description="Book a free rooftop site survey in Kakinada, or schedule a solar consultation with Saanvika Solar Systems.">
+  <section class="max-w-6xl mx-auto px-lg py-4xl">
+    <header class="flex flex-col gap-md max-w-prose mb-3xl">
+      <hr class="editorial-rule w-16 ml-0" />
+      <h1 class="font-display text-4xl md:text-5xl leading-tight">Book a visit</h1>
+      <p class="text-lg text-mute leading-relaxed">
+        Start with a free site survey on your Kakinada rooftop. We'll check shade, structure, and APEPDCL readiness — then walk you through sizing and subsidy paperwork.
+      </p>
+    </header>
+
+    {
+      serviceList.length === 0 ? (
+        <p class="text-mute">Survey slots are updating — check back shortly, or call us to schedule by phone.</p>
+      ) : (
+        <div class="service-grid">
+          {serviceList.map((s) => (
+            <ServiceCard
+              id={s._id}
+              slug={getSlug(s)}
+              name={s.name ?? "Untitled"}
+              tagLine={s.tagLine ?? s.description}
+              durationMinutes={getDuration(s)}
+              price={formatPrice(s)}
+              imageUrl={s.media?.mainMedia?.image?.url ?? s.media?.items?.[0]?.image?.url}
+              type={s.type ?? "APPOINTMENT"}
+            />
+          ))}
+        </div>
+      )
+    }
+  </section>
+</Layout>
