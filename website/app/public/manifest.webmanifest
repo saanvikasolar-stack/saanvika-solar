@@ -12,8 +12,8 @@
   "lang": "en-IN",
   "categories": ["business", "utilities"],
   "icons": [
-    { "src": "https://cdn.jsdelivr.net/gh/saanvikasolar-stack/saanvika-solar@637a2739daf54619c2c7fe877fe0b7bafb299714/website/app/assets/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "https://cdn.jsdelivr.net/gh/saanvikasolar-stack/saanvika-solar@637a2739daf54619c2c7fe877fe0b7bafb299714/website/app/assets/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
-    { "src": "https://cdn.jsdelivr.net/gh/saanvikasolar-stack/saanvika-solar@637a2739daf54619c2c7fe877fe0b7bafb299714/website/app/assets/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    { "src": "https://cdn.jsdelivr.net/gh/saanvikasolar-stack/saanvika-solar@dadf1c0a2d6cddd5d228aa913420b9a1e6834271/website/app/assets/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "https://cdn.jsdelivr.net/gh/saanvikasolar-stack/saanvika-solar@dadf1c0a2d6cddd5d228aa913420b9a1e6834271/website/app/assets/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "https://cdn.jsdelivr.net/gh/saanvikasolar-stack/saanvika-solar@dadf1c0a2d6cddd5d228aa913420b9a1e6834271/website/app/assets/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ]
 }

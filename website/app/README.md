@@ -41,10 +41,10 @@ links it hasn't seen before.
 | `src/styles.css` | Brand styles |
 | `public/manifest.webmanifest` | App name, colours and home-screen icons |
 | `public/sw.js` | Offline support |
-| `assets/` | Logo, icons and preview card, served from this public repo through jsDelivr (pinned to commit `637a273`) |
+| `assets/` | Logo, icons and preview card, served from this public repo through jsDelivr (pinned to commit `dadf1c0`) |
 | `tests/tests.json` | Checks AppDeploy runs after each deploy |
 
-The images load from `cdn.jsdelivr.net/gh/saanvikasolar-stack/saanvika-solar@637a273…`, which only works
+The images load from `cdn.jsdelivr.net/gh/saanvikasolar-stack/saanvika-solar@dadf1c0…`, which only works
 while this repository is **public**.
 
 ## Updating prices
