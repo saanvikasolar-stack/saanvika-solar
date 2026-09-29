@@ -1,0 +1,19 @@
+{
+  "name": "Saanvika Solar – Solar Savings Calculator",
+  "short_name": "Saanvika Solar",
+  "description": "Rooftop solar size, PM Surya Ghar subsidy and savings calculator by SAANVIKA Solar Systems, Kakinada.",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FFFFFF",
+  "theme_color": "#122E3E",
+  "lang": "en-IN",
+  "categories": ["business", "utilities"],
+  "icons": [
+    { "src": "https://cdn.jsdelivr.net/gh/saanvikasolar-stack/saanvika-solar@637a2739daf54619c2c7fe877fe0b7bafb299714/website/app/assets/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "https://cdn.jsdelivr.net/gh/saanvikasolar-stack/saanvika-solar@637a2739daf54619c2c7fe877fe0b7bafb299714/website/app/assets/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "https://cdn.jsdelivr.net/gh/saanvikasolar-stack/saanvika-solar@637a2739daf54619c2c7fe877fe0b7bafb299714/website/app/assets/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

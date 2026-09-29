@@ -1,0 +1,82 @@
+[
+  {
+    "name": "Home estimate with panel type and subsidy",
+    "sanity": true,
+    "viewport": "mobile",
+    "covers": [
+      "brand header with logo, share and call buttons",
+      "home solar estimate",
+      "PM Surya Ghar subsidy",
+      "panel type price range"
+    ],
+    "description": "Verifies the default home estimate, subsidy and the TOPCon price range on a phone.",
+    "steps": [
+      "Open the app",
+      "Check the header shows the Saanvika Solar logo, a share button and a call button",
+      "Check the results show 3 kW, a system price of ₹2.00 – 2.10 lakh and a PM Surya Ghar subsidy of − ₹78,000",
+      "Tap the TOPCon panel type button"
+    ],
+    "expected": "The system price changes to ₹2.10 – 2.20 lakh and the subsidy still shows − ₹78,000."
+  },
+  {
+    "name": "Business mode hides prices",
+    "viewport": "desktop",
+    "covers": [
+      "business customer type",
+      "no prices shown for commercial systems"
+    ],
+    "description": "Verifies commercial customers see a custom quote instead of any price.",
+    "steps": [
+      "Open the app",
+      "Click the Business button",
+      "Look at the Your solar plan panel"
+    ],
+    "expected": "System price shows Custom quote, the subsidy tile shows Tax benefit with Ask us, and the Your cost after subsidy and Money back in tiles are not visible."
+  },
+  {
+    "name": "Bill entry updates the plan and guards an empty bill",
+    "viewport": "mobile",
+    "covers": [
+      "typed bill input",
+      "empty bill guardrail",
+      "system size recalculation"
+    ],
+    "description": "Verifies clearing the bill shows a prompt and typing a new bill recalculates the system.",
+    "steps": [
+      "Open the app",
+      "Clear the Monthly electricity bill field",
+      "Check the plan headline reads Enter your monthly bill",
+      "Type 5000 into the Monthly electricity bill field"
+    ],
+    "expected": "The plan headline reads 5 kW rooftop solar and the system price shows ₹2.80 – 2.95 lakh."
+  },
+  {
+    "name": "Elevated structure and square yards",
+    "viewport": "desktop",
+    "covers": [
+      "elevated structure price",
+      "roof area unit switch"
+    ],
+    "description": "Verifies the elevated structure adds to the price and the roof area converts to square yards.",
+    "steps": [
+      "Open the app",
+      "Turn on the Elevated structure switch",
+      "Click the sq yd button next to the rooftop area"
+    ],
+    "expected": "The system price shows ₹2.09 – 2.19 lakh and the rooftop area field shows 111 sq yd."
+  },
+  {
+    "name": "Contact details are shown",
+    "viewport": "mobile",
+    "covers": [
+      "company contact details",
+      "office address"
+    ],
+    "description": "Verifies customers can see how to reach Saanvika Solar.",
+    "steps": [
+      "Open the app",
+      "Scroll to the Talk to us section"
+    ],
+    "expected": "The section shows 85198 33679, 98853 15789, saanvikasolar@gmail.com, the Sarpavaram, Kakinada office address and www.saanvikasolar.in."
+  }
+]
