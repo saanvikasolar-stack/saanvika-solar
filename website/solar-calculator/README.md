@@ -6,7 +6,7 @@ Visitors enter their monthly electricity bill and rooftop area and instantly see
 - Recommended system size (kW), panel count, panel wattage and roof area used, with a live top-view roof drawing
 - Panel type choice: **Mono PERC** (value) or **TOPCon** (newer, higher wattage), with a wattage picker
 - Bill today vs. bill with solar, and monthly savings
-- System **price range** (depends on panel brand), PM Surya Ghar subsidy (homes), cost after subsidy and payback years
+- For homes: system **price range** (depends on panel brand), PM Surya Ghar subsidy, cost after subsidy and payback years. Business systems show "Custom quote" instead of prices
 - Elevated structure option (+₹3,000 per kW)
 - 25-year savings and CO₂ avoided
 - A **WhatsApp this plan** button that sends the visitor's numbers, panels and price range to 85198 33679 as a ready-made enquiry
@@ -47,6 +47,6 @@ Prices below are Saanvika's rates as of September 2026. Update them here when th
 | `subsidy` | ₹30,000/kW for first 2 kW, ₹18,000 for 3rd kW, max ₹78,000 | PM Surya Ghar central subsidy (homes only) |
 | `whatsappNumber` / `phoneNumber` | 918519833679 | Where enquiries go |
 
-Business (commercial and industrial) systems use the same price line until separate commercial rates are added.
+Business (commercial and industrial) mode shows system size, savings and panels but **no prices**: the price reads "Custom quote", and the cost-after-subsidy and payback tiles are hidden. The WhatsApp message leaves the price out.
 
 After editing, paste the updated file into the same Embed HTML element again and publish.

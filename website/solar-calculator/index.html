@@ -32,6 +32,7 @@
     color-scheme: light;
   }
   * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
   html, body { margin: 0; }
   body {
     font-family: var(--font);
@@ -366,9 +367,9 @@
 
       <div class="stats">
         <div class="stat wide"><span>System price<em id="priceNote">Mono PERC · depends on panel brand</em></span><b id="cost">₹2.00 – 2.10 lakh</b></div>
-        <div class="stat subsidy"><span id="subsidyLabel">PM Surya Ghar subsidy</span><b id="subsidy">− ₹78,000</b></div>
-        <div class="stat"><span>Money back in</span><b id="payback">—</b></div>
-        <div class="stat wide"><span>Your cost after subsidy</span><b id="net">—</b></div>
+        <div class="stat subsidy" id="subsidyTile"><span id="subsidyLabel">PM Surya Ghar subsidy</span><b id="subsidy">− ₹78,000</b></div>
+        <div class="stat" id="paybackTile"><span>Money back in</span><b id="payback">—</b></div>
+        <div class="stat wide" id="netTile"><span>Your cost after subsidy</span><b id="net">—</b></div>
         <div class="stat highlight wide"><span>Total savings over 25 years</span><b id="life">—</b></div>
         <div class="stat wide"><span>Clean energy every year</span><b id="green">—</b></div>
       </div>
@@ -636,22 +637,29 @@ var CONFIG = {
     $("billAfter").textContent = inr(r.billAfter);
     $("monthlySave").textContent = inr(state.bill - r.billAfter);
 
-    $("cost").textContent = has ? moneyRange(r.priceLo, r.priceHi) : "—";
-    $("priceNote").textContent = techLabel() + " · depends on panel brand" +
-      (state.elevated ? " · includes elevated structure (₹" + fmtNum(CONFIG.elevatedPerKw) + "/kW)" : "");
-    if (state.type === "home") {
+    // Homes see prices; commercial and industrial systems are quoted after a site survey
+    var isHome = state.type === "home";
+    $("paybackTile").hidden = !isHome;
+    $("netTile").hidden = !isHome;
+    $("subsidyTile").classList.toggle("wide", !isHome);
+    if (isHome) {
+      $("cost").textContent = has ? moneyRange(r.priceLo, r.priceHi) : "—";
+      $("priceNote").textContent = techLabel() + " · depends on panel brand" +
+        (state.elevated ? " · includes elevated structure (₹" + fmtNum(CONFIG.elevatedPerKw) + "/kW)" : "");
       $("subsidyLabel").textContent = "PM Surya Ghar subsidy";
       $("subsidy").textContent = r.subsidy ? "− " + money(r.subsidy) : "—";
+      $("net").textContent = has ? moneyRange(r.netLo, r.netHi) : "—";
+      if (has && r.yearlySaving > 0) {
+        var p1 = (r.netLo / r.yearlySaving).toFixed(1), p2 = (r.netHi / r.yearlySaving).toFixed(1);
+        $("payback").textContent = p1 === p2 ? p1 + " years" : p1 + " – " + p2 + " yrs";
+      } else {
+        $("payback").textContent = "—";
+      }
     } else {
+      $("cost").textContent = "Custom quote";
+      $("priceNote").textContent = techLabel() + " · priced after a free site survey";
       $("subsidyLabel").textContent = "Tax benefit";
       $("subsidy").textContent = "Ask us";
-    }
-    $("net").textContent = has ? moneyRange(r.netLo, r.netHi) : "—";
-    if (has && r.yearlySaving > 0) {
-      var p1 = (r.netLo / r.yearlySaving).toFixed(1), p2 = (r.netHi / r.yearlySaving).toFixed(1);
-      $("payback").textContent = p1 === p2 ? p1 + " years" : p1 + " – " + p2 + " yrs";
-    } else {
-      $("payback").textContent = "—";
     }
     $("life").textContent = has ? money(r.life) : "—";
     $("green").textContent = has ? (r.co2Kg / 1000).toFixed(1) + " t CO₂ ≈ " + fmtNum(r.co2Kg / CONFIG.co2KgPerTreePerYear) + " trees" : "—";
@@ -659,7 +667,8 @@ var CONFIG = {
     $("segNote").innerHTML = state.type === "home"
       ? "Homes get the <b>PM Surya Ghar subsidy – up to ₹78,000</b>. We handle the full application."
       : "Shops, schools, offices and factories. Bigger systems, faster payback.";
-    $("elevNote").textContent = "Raised panels keep your terrace usable underneath · +₹" + fmtNum(CONFIG.elevatedPerKw) + " per kW";
+    $("elevNote").textContent = "Raised panels keep your terrace usable underneath" +
+      (isHome ? " · +₹" + fmtNum(CONFIG.elevatedPerKw) + " per kW" : "");
 
     var msg = [
       "Hi Saanvika Solar, I used your solar calculator.",
@@ -667,14 +676,16 @@ var CONFIG = {
       "Monthly bill: " + inr(state.bill),
       "Roof area: " + areaText(state.roofSqft) + (state.elevated ? " (elevated structure)" : ""),
       has ? "Suggested system: " + r.kw + " kW, " + r.panels + " x " + state.watts + " W " + techLabel() + " panels" : "Suggested system: needs a site survey",
-      has ? "Estimated price: " + moneyRange(r.priceLo, r.priceHi) : "",
+      has && isHome ? "Estimated price: " + moneyRange(r.priceLo, r.priceHi) : "",
       "Please share a quote and book a free site survey."
     ].filter(Boolean).join("\n");
     $("waBtn").href = "https://wa.me/" + CONFIG.whatsappNumber + "?text=" + encodeURIComponent(msg);
     $("callBtn").href = "tel:" + CONFIG.phoneNumber;
     $("callLabel").textContent = "Call " + CONFIG.phoneDisplay;
 
-    $("disclaimer").textContent = "Estimate only. Price depends on panel brand, type and wattage. Assumes about " +
+    $("disclaimer").textContent = "Estimate only. " +
+      (isHome ? "Price depends on panel brand, type and wattage. " : "Commercial and industrial prices are quoted after a site survey. ") +
+      "Assumes about " +
       CONFIG.unitsPerKwPerMonth + " units per kW per month, ₹" + state.rate + "/unit and " + Math.round(CONFIG.yearlyTariffRise * 100) +
       "% yearly tariff rise. Final system size, price and subsidy are confirmed after a free site survey, DISCOM approval and current PM Surya Ghar rules.";
 
