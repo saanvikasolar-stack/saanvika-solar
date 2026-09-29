@@ -30,10 +30,10 @@ solar blue `#0C7DBE`, sunrise-sky background. No pop-ups.
    If the element on desktop is narrower than 900 px, the calculator switches to one column. Set the height to about 2,350 px in that case.
 5. Publish.
 
-## Update the numbers (before going live)
+## Update the numbers
 
 All business numbers sit in the `CONFIG` block at the top of the `<script>` in `index.html`.
-**Replace the placeholder prices with Saanvika's real price list.**
+Prices below are Saanvika's rates as of September 2026. Update them here when they change.
 
 | Setting | Current value | What it controls |
 |---|---|---|
