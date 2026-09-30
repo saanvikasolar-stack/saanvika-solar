@@ -407,11 +407,13 @@ var CONFIG = {
   // Sizes in between or outside are worked out along the same line.
   // Add more sizes (for example 1, 2, 10) to make those sizes exact.
   priceRange: {
+    2: [175000, 185000],
     3: [200000, 220000],
     5: [280000, 310000],
     10: [450000, 500000]
   },
   elevatedPerKw: 3000,       // extra per kW for an elevated structure
+  minKw: 2,                  // smallest system offered
 
   // Panel options offered. Edit to match the panels you stock.
   panels: {
@@ -518,10 +520,10 @@ var CONFIG = {
   function calculate() {
     var cfg = CONFIG[state.type];
     var units = Math.max(0, state.bill - cfg.fixedCharges) / state.rate;
-    var neededKw = units > 0 ? Math.max(1, Math.round(units / CONFIG.unitsPerKwPerMonth)) : 0;
+    var neededKw = units > 0 ? Math.max(CONFIG.minKw, Math.round(units / CONFIG.unitsPerKwPerMonth)) : 0;
     var roofPanels = Math.floor(state.roofSqft / CONFIG.sqftPerPanel);
     var roofMaxKw = Math.floor(roofPanels * state.watts / 1000);
-    var kw = Math.min(neededKw, roofMaxKw);
+    var kw = roofMaxKw >= CONFIG.minKw ? Math.min(neededKw, roofMaxKw) : 0;
     var panels = kw > 0 ? Math.ceil(kw * 1000 / state.watts) : 0;
     var dcKw = panels * state.watts / 1000;
     var monthlyGen = dcKw * CONFIG.unitsPerKwPerMonth;
@@ -617,7 +619,7 @@ var CONFIG = {
       $("subline").textContent = "Type your average electricity bill to see your solar plan.";
     } else {
       $("headline").textContent = "Let's look at your roof together";
-      $("subline").textContent = "About " + areaText(Math.ceil(1000 / state.watts) * CONFIG.sqftPerPanel) + " of shadow-free area is needed for 1 kW.";
+      $("subline").textContent = "About " + areaText(Math.ceil(CONFIG.minKw * 1000 / state.watts) * CONFIG.sqftPerPanel) + " of shadow-free area is needed for " + CONFIG.minKw + " kW.";
     }
 
     var note = $("note");

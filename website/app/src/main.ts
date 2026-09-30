@@ -31,11 +31,13 @@ const CONFIG = {
     // Low end = Mono PERC with value brands. High end = TOPCon with premium brands.
     // Sizes in between follow a straight line between the nearest two sizes.
     priceRange: {
+        2: [175000, 185000],
         3: [200000, 220000],
         5: [280000, 310000],
         10: [450000, 500000]
     } as Record<number, [number, number]>,
     elevatedPerKw: 3000,
+    minKw: 2,
 
     panels: {
         perc: { label: 'Mono PERC', watts: [540, 545, 550], defaultWatts: 545 },
@@ -197,10 +199,10 @@ interface Result {
 function calculate(): Result {
     const cfg = CONFIG.customers[state.type];
     const units = Math.max(0, state.bill - cfg.fixedCharges) / state.rate;
-    const neededKw = units > 0 ? Math.max(1, Math.round(units / CONFIG.unitsPerKwPerMonth)) : 0;
+    const neededKw = units > 0 ? Math.max(CONFIG.minKw, Math.round(units / CONFIG.unitsPerKwPerMonth)) : 0;
     const roofPanels = Math.floor(state.roofSqft / CONFIG.sqftPerPanel);
     const roofMaxKw = Math.floor(roofPanels * state.watts / 1000);
-    const kw = Math.min(neededKw, roofMaxKw);
+    const kw = roofMaxKw >= CONFIG.minKw ? Math.min(neededKw, roofMaxKw) : 0;
     const panels = kw > 0 ? Math.ceil(kw * 1000 / state.watts) : 0;
     const dcKw = panels * state.watts / 1000;
     const monthlyGen = dcKw * CONFIG.unitsPerKwPerMonth;
@@ -299,7 +301,7 @@ function render(): void {
         el('subline').textContent = 'Type your average electricity bill to see your solar plan.';
     } else {
         el('headline').textContent = 'Let’s look at your roof together';
-        el('subline').textContent = 'About ' + areaText(Math.ceil(1000 / state.watts) * CONFIG.sqftPerPanel) + ' of shadow-free area is needed for 1 kW.';
+        el('subline').textContent = 'About ' + areaText(Math.ceil(CONFIG.minKw * 1000 / state.watts) * CONFIG.sqftPerPanel) + ' of shadow-free area is needed for ' + CONFIG.minKw + ' kW.';
     }
 
     const note = el('note');

@@ -37,7 +37,7 @@ Prices below are Saanvika's rates as of September 2026. Update them here when th
 
 | Setting | Current value | What it controls |
 |---|---|---|
-| `priceRange` | 3 kW: ₹2,00,000 – ₹2,20,000 · 5 kW: ₹2,80,000 – ₹3,10,000 · 10 kW: ₹4,50,000 – ₹5,00,000 | Complete system price range. Sizes in between follow a straight line between the nearest two (for example 4 kW ≈ ₹2.40 – 2.65 lakh, 7 kW ≈ ₹3.48 – 3.86 lakh). Sizes below 3 kW and above 10 kW continue the nearest line (1 kW ≈ ₹1.20 – 1.30 lakh). Add more sizes such as `1` or `2` to fix those prices exactly. |
+| `priceRange` | 2 kW: ₹1,75,000 – ₹1,85,000 · 3 kW: ₹2,00,000 – ₹2,20,000 · 5 kW: ₹2,80,000 – ₹3,10,000 · 10 kW: ₹4,50,000 – ₹5,00,000 | Complete system price range. Sizes in between follow a straight line between the nearest two (for example 4 kW ≈ ₹2.40 – 2.65 lakh, 7 kW ≈ ₹3.48 – 3.86 lakh). Sizes above 10 kW continue the nearest line. The smallest system offered is 2 kW (`minKw`); a roof too small for 2 kW gets a site-survey message instead of a price. |
 | (price split) | Lower half of the range = Mono PERC, upper half = TOPCon | Where each panel type sits in the range. Brand moves the price within that half. |
 | `elevatedPerKw` | ₹3,000 | Extra per kW for an elevated structure |
 | `panels.perc.watts` / `panels.topcon.watts` | 540/545/550 W · 580/590/600 W | Wattages offered in the picker |
