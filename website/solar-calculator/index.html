@@ -1,0 +1,812 @@
+<!doctype html>
+<html lang="en">
+<head>
+<title>Saanvika Solar Calculator</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Telugu:wght@500;700;800&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  /* Layout: inputs card (left) + navy results card (right); stacks to one column on phones. Single light brand theme to match the Wix site. */
+  :root {
+    --navy: #122E3E;
+    --orange: #EB770D;
+    --orange-text: #D9650A;
+    --orange-deep: #C45508;
+    --orange-soft: #F59A3C;
+    --amber: #E9A461;
+    --sky: #87C0D4;
+    --blue: #0C7DBE;
+    --cream: #FFF6EA;
+    --sand: #F3EEE6;
+    --white: #FFFFFF;
+    --ink: #122E3E;
+    --muted: #55686F;
+    --line: #E6E1D8;
+    --green: #1E9E5A;
+    --radius: 24px;
+    --shadow: 0 18px 50px -20px rgba(18, 46, 62, .35);
+    --font: "Poppins", "Noto Sans Telugu", system-ui, sans-serif;
+    --font-te: "Noto Sans Telugu", "Poppins", sans-serif;
+    color-scheme: light;
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html, body { margin: 0; }
+  body {
+    font-family: var(--font);
+    color: var(--ink);
+    background:
+      radial-gradient(520px 320px at 88% -40px, rgba(245, 154, 60, .55), transparent 70%),
+      linear-gradient(180deg, #D6ECF5 0%, #FFF3E2 42%, #FFFFFF 100%);
+    background-color: #FFFFFF;
+    -webkit-font-smoothing: antialiased;
+  }
+  .te { font-family: var(--font-te); }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 32px 16px 28px; }
+
+  .nojs { margin: 0 0 18px; padding: 14px 16px; border-radius: 14px; background: var(--cream); border: 1.5px solid #F4D9B8; color: var(--ink); font-size: 14px; line-height: 1.5; }
+
+  /* Header */
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--white); color: var(--navy);
+    font-size: 12px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase;
+    padding: 7px 14px; border-radius: 999px; box-shadow: 0 6px 18px -10px rgba(18,46,62,.5);
+  }
+  .eyebrow svg { width: 16px; height: 16px; flex: none; }
+  h2.title {
+    margin: 14px 0 6px; line-height: 1.35; font-weight: 800; text-wrap: balance;
+    font-size: clamp(26px, 4.4vw, 44px); color: var(--navy);
+  }
+  h2.title .accent { color: var(--orange-text); position: relative; white-space: nowrap; }
+  h2.title .brush { position: absolute; left: 0; right: 0; bottom: -10px; width: 100%; height: 14px; }
+  .lede { margin: 16px 0 26px; max-width: 640px; color: var(--muted); font-size: 16px; line-height: 1.6; }
+
+  .grid { display: grid; gap: 20px; grid-template-columns: 1fr; align-items: start; }
+  .grid > * { min-width: 0; }
+  @media (min-width: 900px) { .grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: 24px; } }
+
+  .card { background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px; }
+  @media (min-width: 900px) { .card { padding: 28px; } }
+
+  /* Segmented controls */
+  .seg { display: grid; grid-template-columns: 1fr 1fr; background: var(--sand); border-radius: 16px; padding: 5px; gap: 5px; }
+  .seg button {
+    appearance: none; border: 0; cursor: pointer; border-radius: 12px; padding: 10px 8px;
+    background: transparent; color: var(--navy); font: 600 14px/1.25 var(--font);
+    display: flex; align-items: center; justify-content: center; gap: 8px; text-align: left;
+    transition: background .2s, color .2s, box-shadow .2s;
+  }
+  .seg button small { display: block; font-weight: 500; font-size: 12px; color: inherit; opacity: .8; }
+  .seg-type button small { font-family: var(--font-te); }
+  .seg button svg { width: 20px; height: 20px; flex: none; }
+  .seg button[aria-pressed="true"] { background: var(--navy); color: var(--white); box-shadow: 0 8px 18px -10px rgba(18,46,62,.8); }
+  .seg button:focus-visible { outline: 3px solid rgba(12,125,190,.45); outline-offset: 2px; }
+  .seg-note { margin: 10px 2px 0; font-size: 12.5px; color: var(--muted); line-height: 1.5; }
+  .seg-note b { color: var(--green); }
+
+  /* Fields */
+  .field { margin-top: 24px; }
+  .field-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+  .field-label { font-weight: 700; font-size: 15px; }
+  .field-label .te { display: block; font-weight: 500; font-size: 13px; color: var(--muted); margin-top: 2px; }
+  .field-side { display: grid; gap: 6px; justify-items: end; }
+  .value-box {
+    display: flex; align-items: center; gap: 4px; background: var(--cream); border: 1.5px solid #F4D9B8;
+    border-radius: 12px; padding: 6px 10px; min-width: 132px; justify-content: flex-end;
+  }
+  .value-box span { font-weight: 700; color: var(--orange-text); white-space: nowrap; }
+  .value-box input {
+    width: 100%; min-width: 0; border: 0; background: transparent; text-align: right;
+    font: 700 20px var(--font); color: var(--navy); outline: none;
+  }
+  .value-box:focus-within { border-color: var(--orange); }
+
+  input[type=range] {
+    --p: 50%;
+    -webkit-appearance: none; appearance: none; width: 100%; height: 30px; background: transparent; cursor: pointer; margin: 0;
+  }
+  input[type=range]::-webkit-slider-runnable-track {
+    height: 10px; border-radius: 999px;
+    background: linear-gradient(90deg, var(--amber), var(--orange) var(--p), #EDE7DD var(--p));
+  }
+  input[type=range]::-moz-range-track { height: 10px; border-radius: 999px; background: #EDE7DD; }
+  input[type=range]::-moz-range-progress { height: 10px; border-radius: 999px; background: linear-gradient(90deg, var(--amber), var(--orange)); }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 28px; height: 28px; margin-top: -9px; border-radius: 50%;
+    background: var(--orange); border: 5px solid var(--white); box-shadow: 0 4px 14px rgba(235,119,13,.55);
+  }
+  input[type=range]::-moz-range-thumb {
+    width: 18px; height: 18px; border-radius: 50%; background: var(--orange); border: 5px solid var(--white);
+    box-shadow: 0 4px 14px rgba(235,119,13,.55);
+  }
+  input[type=range]:focus-visible { outline: 3px solid rgba(12,125,190,.35); outline-offset: 4px; border-radius: 999px; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+  .chip {
+    appearance: none; border: 1.5px solid var(--line); background: var(--white); color: var(--navy);
+    font: 600 13px var(--font); padding: 6px 12px; border-radius: 999px; cursor: pointer; transition: all .15s;
+  }
+  .chip:hover { border-color: var(--orange); color: var(--orange-text); }
+  .chip:focus-visible { outline: 3px solid rgba(12,125,190,.45); outline-offset: 2px; }
+
+  .unit-toggle { display: inline-flex; background: var(--sand); border-radius: 10px; padding: 3px; }
+  .unit-toggle button {
+    appearance: none; border: 0; background: transparent; cursor: pointer; border-radius: 8px;
+    padding: 5px 9px; font: 600 12px var(--font); color: var(--muted);
+  }
+  .unit-toggle button[aria-pressed="true"] { background: var(--white); color: var(--navy); box-shadow: 0 2px 8px rgba(18,46,62,.12); }
+
+  .select-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 12px; font-size: 14px; color: var(--muted); }
+  .select-row select {
+    appearance: none; -webkit-appearance: none; cursor: pointer;
+    font: 600 15px var(--font); color: var(--navy); background: var(--cream);
+    border: 1.5px solid #F4D9B8; border-radius: 12px; padding: 8px 34px 8px 12px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23D9650A' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 12px center;
+  }
+  .select-row select:focus-visible { outline: 3px solid rgba(12,125,190,.35); outline-offset: 2px; }
+
+  /* Roof plan */
+  .roof {
+    margin-top: 16px; border-radius: 18px; padding: 14px; background: linear-gradient(160deg, #F7F2EA, #EFE7DB);
+    border: 1px solid var(--line);
+  }
+  .roof-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: 12.5px; color: var(--muted); margin-bottom: 10px; }
+  .roof-head b { color: var(--navy); text-align: right; }
+  .roof svg { width: 100%; height: auto; display: block; }
+  .roof .legend { display: flex; gap: 14px; margin-top: 10px; font-size: 12px; color: var(--muted); flex-wrap: wrap; }
+  .roof .legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; vertical-align: -2px; margin-right: 5px; }
+
+  /* Switch */
+  .switch-row { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-top: 18px; padding: 14px 16px; border-radius: 16px; background: #F6FAFC; border: 1px solid #DCEBF2; }
+  .switch-row p { margin: 0; font-size: 14px; font-weight: 600; }
+  .switch-row p span { display: block; font-weight: 400; font-size: 12.5px; color: var(--muted); margin-top: 2px; }
+  .switch { position: relative; width: 52px; height: 30px; flex: none; }
+  .switch input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; margin: 0; cursor: pointer; z-index: 1; }
+  .switch .track { position: absolute; inset: 0; border-radius: 999px; background: #CBD6DB; transition: background .2s; }
+  .switch .track::after {
+    content: ""; position: absolute; top: 3px; left: 3px; width: 24px; height: 24px; border-radius: 50%;
+    background: var(--white); box-shadow: 0 2px 6px rgba(0,0,0,.2); transition: transform .2s;
+  }
+  .switch input:checked + .track { background: var(--blue); }
+  .switch input:checked + .track::after { transform: translateX(22px); }
+  .switch input:focus-visible + .track { outline: 3px solid rgba(12,125,190,.35); outline-offset: 2px; }
+
+  details.adv { margin-top: 16px; font-size: 13.5px; }
+  details.adv summary { cursor: pointer; color: var(--blue); font-weight: 600; }
+  details.adv .row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 10px; color: var(--muted); }
+  details.adv input { width: 96px; padding: 8px 10px; border-radius: 10px; border: 1.5px solid var(--line); font: 600 15px var(--font); color: var(--navy); text-align: right; background: var(--white); }
+
+  /* Results */
+  .result {
+    position: relative; overflow: hidden; color: var(--white);
+    background:
+      radial-gradient(420px 260px at 100% 0%, rgba(245,154,60,.45), transparent 70%),
+      radial-gradient(360px 220px at 0% 100%, rgba(12,125,190,.35), transparent 70%),
+      var(--navy);
+  }
+  .result h3 { margin: 0; font-size: 13px; letter-spacing: .14em; text-transform: uppercase; color: var(--sky); font-weight: 700; }
+  .hero-row { display: flex; align-items: center; gap: 18px; margin-top: 14px; }
+  .hero-text { min-width: 0; }
+  .gauge { width: 132px; height: 132px; flex: none; position: relative; }
+  .gauge svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+  .gauge .ring-bg { stroke: rgba(255,255,255,.12); }
+  .gauge .ring { stroke: url(#gaugeGrad); transition: stroke-dashoffset .6s cubic-bezier(.2,.8,.2,1); }
+  .gauge .center { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; }
+  .gauge .kw { font-size: 34px; font-weight: 800; line-height: 1; }
+  .gauge .kw small { font-size: 16px; font-weight: 700; margin-left: 2px; }
+  .gauge .cov { font-size: 11.5px; color: var(--sky); margin-top: 4px; white-space: nowrap; }
+  .hero-text p { margin: 0; }
+  .hero-text .big { font-size: 20px; font-weight: 700; line-height: 1.35; }
+  .hero-text .small { margin-top: 6px; font-size: 13.5px; color: #C9DCE4; line-height: 1.5; }
+  .note { margin-top: 14px; padding: 10px 12px; border-radius: 12px; font-size: 13px; line-height: 1.5; background: rgba(245,154,60,.18); color: #FFE3C4; }
+
+  .bills { margin-top: 18px; display: grid; gap: 10px; }
+  .bill { display: grid; grid-template-columns: 96px 1fr auto; align-items: center; gap: 10px; font-size: 13px; }
+  .bill .bar { height: 14px; border-radius: 999px; background: rgba(255,255,255,.1); overflow: hidden; }
+  .bill .bar i { display: block; height: 100%; border-radius: 999px; transition: width .6s cubic-bezier(.2,.8,.2,1); }
+  .bill.before .bar i { background: linear-gradient(90deg, #8FA3AD, #C3D0D6); }
+  .bill.after .bar i { background: linear-gradient(90deg, var(--amber), var(--orange)); }
+  .bill b { font-size: 15px; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .saves { margin: 10px 0 0; font-size: 14px; color: #C9DCE4; }
+  .saves b { color: var(--orange-soft); font-size: 20px; }
+
+  .stats { margin-top: 18px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .stat { background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.08); border-radius: 16px; padding: 12px 14px; min-width: 0; }
+  .stat span { display: block; font-size: 12px; color: #B9CED7; }
+  .stat b { display: block; font-size: 19px; font-weight: 700; margin-top: 3px; font-variant-numeric: tabular-nums; }
+  .stat em { display: block; font-style: normal; font-size: 11.5px; color: #9FB6C0; margin-top: 3px; line-height: 1.4; }
+  .stat.subsidy { background: var(--white); color: var(--navy); }
+  .stat.subsidy span { color: var(--muted); }
+  .stat.subsidy b { color: var(--green); }
+  .stat.highlight { background: linear-gradient(135deg, var(--orange), #F28A2E); border-color: transparent; }
+  .stat.highlight span { color: #FFF1E2; }
+  .stat.wide { grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+  .stat.wide b { margin: 0; white-space: nowrap; }
+
+  .cta { margin-top: 20px; display: grid; gap: 10px; }
+  .btn {
+    display: flex; align-items: center; justify-content: center; gap: 10px; text-decoration: none; text-align: center;
+    border-radius: 999px; padding: 15px 20px; font: 700 18px var(--font); transition: transform .15s, box-shadow .15s;
+  }
+  .btn svg { width: 22px; height: 22px; flex: none; }
+  .btn.primary { background: var(--orange-deep); color: var(--white); box-shadow: 0 12px 26px -12px rgba(235,119,13,.9); }
+  .btn.primary:hover { transform: translateY(-1px); }
+  .btn.ghost { background: transparent; color: var(--white); border: 1.5px solid rgba(255,255,255,.35); font-size: 16px; padding: 12px 18px; }
+  .btn:focus-visible { outline: 3px solid var(--sky); outline-offset: 3px; }
+  .cta-te { text-align: center; margin: 4px 0 0; font-size: 15px; font-weight: 700; color: var(--orange-soft); }
+  .disclaimer { margin: 14px 0 0; font-size: 11.5px; line-height: 1.55; color: #9FB6C0; }
+
+  .foot { margin-top: 18px; text-align: center; font-size: 12.5px; color: var(--muted); }
+  .foot b { color: var(--navy); }
+
+  @media (max-width: 560px) {
+    .field-head { flex-direction: column; align-items: stretch; }
+    .field-side { justify-items: stretch; }
+    .unit-toggle { justify-self: start; }
+    .value-box { min-width: 0; }
+    .stat.wide { flex-direction: column; align-items: flex-start; gap: 2px; }
+    .btn { font-size: 16px; }
+  }
+  @media (max-width: 420px) {
+    .hero-row { gap: 14px; }
+    .gauge { width: 112px; height: 112px; }
+    .gauge .kw { font-size: 28px; }
+    .bill { grid-template-columns: 82px 1fr auto; }
+    .stat b { font-size: 17px; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <noscript><p class="nojs">This calculator needs JavaScript to run. Open it in Chrome, Safari or on the Saanvika Solar website to use it.</p></noscript>
+
+  <header>
+    <span class="eyebrow">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#EB770D" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg>
+      Rooftop area &amp; savings calculator
+    </span>
+    <h2 class="title te">సూర్యుడి వెలుగు... <span class="accent">మీ ఇంటి పొదుపు!<svg class="brush" viewBox="0 0 300 14" preserveAspectRatio="none" aria-hidden="true"><path d="M3 9 C 70 3, 160 2, 297 6 L 296 11 C 170 8, 80 9, 5 13 Z" fill="#EB770D"/></svg></span></h2>
+    <p class="lede">Enter your electricity bill and rooftop area, and pick your panel type. See the system your roof can hold, its price range, your PM Surya Ghar subsidy, payback time and 25-year savings.</p>
+  </header>
+
+  <div class="grid">
+    <!-- Inputs -->
+    <section class="card" aria-label="Your details">
+      <div class="seg seg-type" role="group" aria-label="Customer type">
+        <button type="button" data-type="home" aria-pressed="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M3 11 12 4l9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-5h4v5"/></svg>
+          <span>Home<small>ఇల్లు</small></span>
+        </button>
+        <button type="button" data-type="business" aria-pressed="false">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M4 21V8l6-3v16"/><path d="M10 21V3l10 4v14"/><path d="M2 21h20M14 10h2M14 14h2M6 12h1M6 16h1"/></svg>
+          <span>Business<small>వ్యాపారం</small></span>
+        </button>
+      </div>
+      <p class="seg-note" id="segNote">Homes get the <b>PM Surya Ghar subsidy – up to ₹78,000</b>. We handle the full application.</p>
+
+      <div class="field">
+        <div class="field-head">
+          <label class="field-label" for="billNum">Monthly electricity bill<span class="te">నెలవారీ కరెంట్ బిల్</span></label>
+          <div class="value-box"><span>₹</span><input id="billNum" inputmode="numeric" autocomplete="off" value="3,000"></div>
+        </div>
+        <input type="range" id="billRange" min="0" max="1000" step="1" value="458" aria-label="Monthly electricity bill">
+        <div class="chips" id="billChips" aria-label="Common bill amounts"></div>
+      </div>
+
+      <div class="field">
+        <div class="field-head">
+          <label class="field-label" for="roofNum">Shadow-free rooftop area<span class="te">పైకప్పు విస్తీర్ణం</span></label>
+          <div class="field-side">
+            <div class="unit-toggle" role="group" aria-label="Area unit">
+              <button type="button" data-unit="sqft" aria-pressed="true">sq ft</button>
+              <button type="button" data-unit="sqyd" aria-pressed="false">sq yd <span class="te">(గజాలు)</span></button>
+            </div>
+            <div class="value-box"><input id="roofNum" inputmode="numeric" autocomplete="off" value="1,000"><span id="roofUnit">sq ft</span></div>
+          </div>
+        </div>
+        <input type="range" id="roofRange" min="0" max="1000" step="1" value="404" aria-label="Rooftop area">
+        <div class="roof" aria-hidden="true">
+          <div class="roof-head"><span>Your roof · top view</span><b id="roofCaption"></b></div>
+          <svg id="roofSvg" viewBox="0 0 320 160"></svg>
+          <div class="legend">
+            <span><i style="background:linear-gradient(135deg,#0C7DBE,#122E3E)"></i>Solar panels</span>
+            <span><i style="background:#FBF8F3;border:1.5px dashed #C8BBA8"></i>Free terrace</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="field-label" id="panelLabel">Solar panel type<span class="te">సోలార్ ప్యానెల్ రకం</span></div>
+        <div class="seg seg-panel" role="group" aria-labelledby="panelLabel" style="margin-top:10px">
+          <button type="button" data-tech="perc" aria-pressed="true"><span>Mono PERC<small>Best value</small></span></button>
+          <button type="button" data-tech="topcon" aria-pressed="false"><span>TOPCon<small>Newer, higher wattage</small></span></button>
+        </div>
+        <div class="select-row"><label for="watts">Panel wattage</label><select id="watts"></select></div>
+      </div>
+
+      <div class="switch-row">
+        <p>Elevated structure<span id="elevNote">Raised panels keep your terrace usable underneath</span></p>
+        <label class="switch"><input type="checkbox" id="elevated" aria-label="Elevated structure"><span class="track"></span></label>
+      </div>
+
+      <details class="adv">
+        <summary>Adjust electricity rate</summary>
+        <div class="row"><label for="rate">Average cost per unit (₹/kWh)</label><input id="rate" type="number" min="1" max="30" step="0.1" value="7.5"></div>
+      </details>
+    </section>
+
+    <!-- Results -->
+    <section class="card result" aria-live="polite" aria-label="Your solar estimate">
+      <h3>Your solar plan</h3>
+      <div class="hero-row">
+        <div class="gauge">
+          <svg viewBox="0 0 120 120" aria-hidden="true">
+            <defs><linearGradient id="gaugeGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E9A461"/><stop offset="1" stop-color="#EB770D"/></linearGradient></defs>
+            <circle class="ring-bg" cx="60" cy="60" r="52" fill="none" stroke-width="10"/>
+            <circle class="ring" id="ring" cx="60" cy="60" r="52" fill="none" stroke-width="10" stroke-linecap="round" stroke-dasharray="326.73" stroke-dashoffset="0"/>
+          </svg>
+          <div class="center"><div class="kw" id="kw">3<small>kW</small></div><div class="cov" id="cov">100% covered</div></div>
+        </div>
+        <div class="hero-text">
+          <p class="big" id="headline">3 kW rooftop solar</p>
+          <p class="small" id="subline">6 × 545 W Mono PERC panels</p>
+        </div>
+      </div>
+      <div class="note" id="note" hidden></div>
+
+      <div class="bills">
+        <div class="bill before"><span>Bill today</span><div class="bar"><i id="barBefore" style="width:100%"></i></div><b id="billBefore">₹3,000</b></div>
+        <div class="bill after"><span>With solar</span><div class="bar"><i id="barAfter" style="width:5%"></i></div><b id="billAfter">₹100</b></div>
+      </div>
+      <p class="saves">You save about <b id="monthlySave">₹2,900</b> every month</p>
+
+      <div class="stats">
+        <div class="stat wide"><span>System price<em id="priceNote">Mono PERC · depends on panel brand</em></span><b id="cost">₹2.00 – 2.10 lakh</b></div>
+        <div class="stat subsidy" id="subsidyTile"><span id="subsidyLabel">PM Surya Ghar subsidy</span><b id="subsidy">− ₹78,000</b></div>
+        <div class="stat" id="paybackTile"><span>Money back in</span><b id="payback">—</b></div>
+        <div class="stat wide" id="netTile"><span>Your cost after subsidy</span><b id="net">—</b></div>
+        <div class="stat highlight wide"><span>Total savings over 25 years</span><b id="life">—</b></div>
+        <div class="stat wide"><span>Clean energy every year</span><b id="green">—</b></div>
+      </div>
+
+      <div class="cta">
+        <a class="btn primary" id="waBtn" href="https://wa.me/918519833679" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.9 9.9 0 0 0 4.74 1.21h.01c5.46 0 9.91-4.45 9.91-9.91A9.9 9.9 0 0 0 12.04 2Zm5.8 14.03c-.24.68-1.42 1.3-1.96 1.35-.5.05-1.13.07-1.83-.11a16.7 16.7 0 0 1-1.66-.61c-2.92-1.26-4.83-4.2-4.97-4.4-.15-.2-1.19-1.58-1.19-3.01 0-1.43.75-2.13 1.02-2.43.27-.29.58-.37.78-.37h.56c.18.01.42-.07.66.5.24.58.83 2.01.9 2.15.08.15.12.32.02.51-.1.2-.15.32-.29.49-.15.17-.31.39-.44.52-.15.15-.3.3-.13.6.17.29.76 1.26 1.64 2.04 1.13 1.01 2.08 1.32 2.37 1.47.3.15.47.12.64-.07.17-.2.73-.85.93-1.14.2-.29.39-.24.66-.15.27.1 1.7.8 1.99.95.29.15.49.22.56.34.07.12.07.7-.17 1.38Z"/></svg>
+          WhatsApp this plan
+        </a>
+        <a class="btn ghost" id="callBtn" href="tel:+918519833679" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2Z"/></svg>
+          <span id="callLabel">Call 85198 33679</span>
+        </a>
+        <p class="cta-te te">ఈరోజే సోలార్‌కు మారండి!</p>
+      </div>
+      <p class="disclaimer" id="disclaimer">Estimate only. Final system size, price and subsidy are confirmed after a free site survey.</p>
+    </section>
+  </div>
+
+  <p class="foot"><b>Saanvika Solar</b> · Kakinada, Andhra Pradesh · <span class="te">మరిన్ని వివరాలకు సంప్రదించండి</span></p>
+</div>
+
+<script>
+/* ============================================================
+   SAANVIKA SOLAR – CALCULATOR SETTINGS
+   Update these numbers when prices or rules change.
+   ============================================================ */
+var CONFIG = {
+  whatsappNumber: "918519833679",
+  phoneNumber: "+918519833679",
+  phoneDisplay: "85198 33679",
+
+  // Complete system price range in rupees, by system size in kW: [lowest, highest].
+  // Low end = Mono PERC with value brands. High end = TOPCon with premium brands.
+  // Sizes in between or outside are worked out along the same line.
+  // Add more sizes (for example 1, 2, 10) to make those sizes exact.
+  priceRange: {
+    2: [175000, 185000],
+    3: [200000, 220000],
+    5: [280000, 310000],
+    10: [450000, 500000]
+  },
+  elevatedPerKw: 3000,       // extra per kW for an elevated structure
+  minKw: 2,                  // smallest system offered
+
+  // Panel options offered. Edit to match the panels you stock.
+  panels: {
+    perc:   { label: "Mono PERC", watts: [540, 545, 550], defaultWatts: 545 },
+    topcon: { label: "TOPCon",    watts: [580, 590, 600], defaultWatts: 590 }
+  },
+  sqftPerPanel: 50,          // shadow-free roof area one panel needs, including spacing
+
+  unitsPerKwPerMonth: 120,   // average generation of 1 kW of panels in Andhra Pradesh
+  yearlyTariffRise: 0.03,    // electricity price increase per year
+  yearlyPanelLoss: 0.005,    // panel output loss per year
+  co2KgPerUnit: 0.716,       // CO2 avoided per unit of solar (India grid)
+  co2KgPerTreePerYear: 21,
+
+  // PM Surya Ghar (homes only): Rs 30,000/kW for the first 2 kW, Rs 18,000 for the 3rd kW, max Rs 78,000
+  subsidy: { perKwFirstTwo: 30000, thirdKw: 18000, max: 78000 },
+
+  home: {
+    ratePerUnit: 7.5, fixedCharges: 100,
+    billMin: 500, billMax: 25000, billDefault: 3000, chips: [1500, 3000, 5000, 10000]
+  },
+  business: {
+    ratePerUnit: 10, fixedCharges: 500,
+    billMin: 5000, billMax: 1000000, billDefault: 50000, chips: [20000, 50000, 100000, 300000]
+  },
+
+  roofMinSqft: 100, roofMaxSqft: 30000, roofDefaultSqft: 1000
+};
+/* ============================================================ */
+
+(function () {
+  "use strict";
+
+  var SQYD = 9;
+  var CIRC = 326.73;
+  var state = {
+    type: "home",
+    bill: CONFIG.home.billDefault,
+    roofSqft: CONFIG.roofDefaultSqft,
+    unit: "sqft",
+    tech: "perc",
+    watts: CONFIG.panels.perc.defaultWatts,
+    elevated: false,
+    rate: CONFIG.home.ratePerUnit
+  };
+
+  function $(id) { return document.getElementById(id); }
+  function all(sel) { return Array.prototype.slice.call(document.querySelectorAll(sel)); }
+
+  function fmtNum(n) { return Math.round(n).toLocaleString("en-IN"); }
+  function inr(n) { return "₹" + fmtNum(n); }
+  function money(n) {
+    if (n >= 1e7) return "₹" + (n / 1e7).toFixed(2) + " crore";
+    if (n >= 1e5) return "₹" + (n / 1e5).toFixed(n >= 1e6 ? 1 : 2) + " lakh";
+    return inr(n);
+  }
+  function moneyRange(lo, hi) {
+    if (Math.round(lo / 1000) === Math.round(hi / 1000)) return money(lo);
+    if (lo >= 1e7) return "₹" + (lo / 1e7).toFixed(2) + " – " + (hi / 1e7).toFixed(2) + " crore";
+    if (lo >= 1e5) {
+      var d = hi >= 1e6 ? 1 : 2;
+      return "₹" + (lo / 1e5).toFixed(d) + " – " + (hi / 1e5).toFixed(d) + " lakh";
+    }
+    return inr(lo) + " – " + fmtNum(hi);
+  }
+  function parseNum(s) { return Number(String(s).replace(/[^\d.]/g, "")) || 0; }
+  function round1000(n) { return Math.round(n / 1000) * 1000; }
+
+  // Log-scale sliders so small and large values are both easy to pick
+  function toSlider(v, min, max) {
+    var c = Math.min(Math.max(v, min), max);
+    return Math.round(1000 * Math.log(c / min) / Math.log(max / min));
+  }
+  function fromSlider(t, min, max) { return min * Math.pow(max / min, t / 1000); }
+  function niceRound(v) {
+    var step = v < 2000 ? 50 : v < 10000 ? 100 : v < 100000 ? 500 : v < 1000000 ? 1000 : 5000;
+    return Math.round(v / step) * step;
+  }
+  function setFill(el) { el.style.setProperty("--p", (el.value / el.max * 100) + "%"); }
+
+  // Price range for a system of `kw`, from the anchor sizes in CONFIG.priceRange
+  function priceRangeFor(kw) {
+    var sizes = Object.keys(CONFIG.priceRange).map(Number).sort(function (a, b) { return a - b; });
+    if (sizes.length === 1) {
+      var only = CONFIG.priceRange[sizes[0]];
+      return [only[0] / sizes[0] * kw, only[1] / sizes[0] * kw];
+    }
+    var a = sizes[0], b = sizes[1];
+    for (var i = 0; i < sizes.length - 1; i++) {
+      if (kw >= sizes[i]) { a = sizes[i]; b = sizes[i + 1]; }
+    }
+    var pa = CONFIG.priceRange[a], pb = CONFIG.priceRange[b];
+    var t = (kw - a) / (b - a);
+    return [Math.max(0, pa[0] + (pb[0] - pa[0]) * t), Math.max(0, pa[1] + (pb[1] - pa[1]) * t)];
+  }
+
+  function subsidyFor(kw) {
+    if (state.type !== "home" || kw <= 0) return 0;
+    var s = CONFIG.subsidy;
+    var amount = Math.min(kw, 2) * s.perKwFirstTwo + Math.max(0, Math.min(kw - 2, 1)) * s.thirdKw;
+    return Math.min(amount, s.max);
+  }
+
+  function calculate() {
+    var cfg = CONFIG[state.type];
+    var units = Math.max(0, state.bill - cfg.fixedCharges) / state.rate;
+    var neededKw = units > 0 ? Math.max(CONFIG.minKw, Math.round(units / CONFIG.unitsPerKwPerMonth)) : 0;
+    var roofPanels = Math.floor(state.roofSqft / CONFIG.sqftPerPanel);
+    var roofMaxKw = Math.floor(roofPanels * state.watts / 1000);
+    var kw = roofMaxKw >= CONFIG.minKw ? Math.min(neededKw, roofMaxKw) : 0;
+    var panels = kw > 0 ? Math.ceil(kw * 1000 / state.watts) : 0;
+    var dcKw = panels * state.watts / 1000;
+    var monthlyGen = dcKw * CONFIG.unitsPerKwPerMonth;
+    var coverage = units > 0 ? Math.min(1, monthlyGen / units) : 0;
+    var monthlySaving = Math.min(monthlyGen, units) * state.rate;
+    var billAfter = Math.min(state.bill, Math.max(cfg.fixedCharges, state.bill - monthlySaving));
+
+    var full = priceRangeFor(kw);
+    var mid = (full[0] + full[1]) / 2;
+    var range = state.tech === "perc" ? [full[0], mid] : [mid, full[1]];
+    var extra = state.elevated ? CONFIG.elevatedPerKw * kw : 0;
+    var priceLo = kw > 0 ? round1000(range[0] + extra) : 0;
+    var priceHi = kw > 0 ? round1000(range[1] + extra) : 0;
+    var subsidy = subsidyFor(kw);
+    var netLo = Math.max(0, priceLo - subsidy);
+    var netHi = Math.max(0, priceHi - subsidy);
+
+    var yearlySaving = (state.bill - billAfter) * 12;
+    var life = 0;
+    for (var y = 0; y < 25; y++) {
+      var gen = monthlyGen * Math.pow(1 - CONFIG.yearlyPanelLoss, y);
+      life += Math.min(gen, units) * 12 * state.rate * Math.pow(1 + CONFIG.yearlyTariffRise, y);
+    }
+
+    return {
+      units: units, neededKw: neededKw, roofPanels: roofPanels, roofMaxKw: roofMaxKw, kw: kw,
+      panels: panels, dcKw: dcKw, monthlyGen: monthlyGen, coverage: coverage, billAfter: billAfter,
+      priceLo: priceLo, priceHi: priceHi, subsidy: subsidy, netLo: netLo, netHi: netHi,
+      yearlySaving: yearlySaving, life: life, usedSqft: panels * CONFIG.sqftPerPanel,
+      co2Kg: monthlyGen * 12 * CONFIG.co2KgPerUnit
+    };
+  }
+
+  function areaText(sqft) {
+    return state.unit === "sqft" ? fmtNum(sqft) + " sq ft" : fmtNum(sqft / SQYD) + " sq yd";
+  }
+  function techLabel() { return CONFIG.panels[state.tech].label; }
+
+  function drawRoof(r) {
+    var slots = Math.max(1, r.roofPanels);
+    var filled = r.panels;
+    var perTile = 1;
+    var MAX_TILES = 72;
+    if (slots > MAX_TILES) {
+      perTile = Math.ceil(slots / MAX_TILES);
+      slots = Math.ceil(slots / perTile);
+      filled = Math.ceil(filled / perTile);
+    }
+    filled = Math.min(filled, slots);
+
+    var W = 320, H = 160, pad = 12, gap = 4;
+    var cols = Math.max(1, Math.min(slots, Math.round(Math.sqrt(slots * 2.1))));
+    var rows = Math.ceil(slots / cols);
+    var cw = (W - pad * 2 - gap * (cols - 1)) / cols;
+    var ch = Math.min(cw * 0.62, (H - pad * 2 - gap * (rows - 1)) / rows);
+    var top = (H - (rows * ch + (rows - 1) * gap)) / 2;
+
+    var out = '<defs>' +
+      '<linearGradient id="pv" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1A8FD6"/><stop offset=".55" stop-color="#0C5F93"/><stop offset="1" stop-color="#122E3E"/></linearGradient>' +
+      '<pattern id="cells" width="6" height="6" patternUnits="userSpaceOnUse"><path d="M6 0H0V6" fill="none" stroke="rgba(255,255,255,.22)" stroke-width=".7"/></pattern>' +
+      '</defs>' +
+      '<rect x="2" y="2" width="' + (W - 4) + '" height="' + (H - 4) + '" rx="12" fill="#E6DCCD" stroke="#CDBFAB" stroke-width="3"/>';
+    for (var i = 0; i < slots; i++) {
+      var c = i % cols, row = Math.floor(i / cols);
+      var x = (pad + c * (cw + gap)).toFixed(2), y = (top + row * (ch + gap)).toFixed(2);
+      if (i < filled) {
+        out += '<rect x="' + x + '" y="' + y + '" width="' + cw.toFixed(2) + '" height="' + ch.toFixed(2) + '" rx="2.5" fill="url(#pv)"/>' +
+               '<rect x="' + x + '" y="' + y + '" width="' + cw.toFixed(2) + '" height="' + ch.toFixed(2) + '" rx="2.5" fill="url(#cells)"/>';
+      } else {
+        out += '<rect x="' + (+x + .75).toFixed(2) + '" y="' + (+y + .75).toFixed(2) + '" width="' + (cw - 1.5).toFixed(2) + '" height="' + (ch - 1.5).toFixed(2) + '" rx="2.5" fill="#FBF8F3" stroke="#C8BBA8" stroke-width="1.2" stroke-dasharray="3 3"/>';
+      }
+    }
+    $("roofSvg").innerHTML = out;
+    $("roofCaption").textContent = perTile > 1
+      ? "1 tile ≈ " + perTile + " panels"
+      : r.panels + " of " + r.roofPanels + " panel spaces used";
+  }
+
+  function render() {
+    var r = calculate();
+    var has = r.kw > 0;
+
+    $("kw").innerHTML = r.kw + "<small>kW</small>";
+    $("cov").textContent = has ? Math.round(r.coverage * 100) + "% covered" : "";
+    $("ring").style.strokeDashoffset = String(CIRC * (1 - r.coverage));
+
+    if (has) {
+      $("headline").textContent = r.kw + " kW rooftop solar";
+      $("subline").textContent = r.panels + " × " + state.watts + " W " + techLabel() + " panels (" + r.dcKw.toFixed(2) +
+        " kWp) · about " + fmtNum(r.monthlyGen) + " units a month · uses ~" + areaText(r.usedSqft) + " of your " + areaText(state.roofSqft);
+    } else if (r.units <= 0) {
+      $("headline").textContent = "Enter your monthly bill";
+      $("subline").textContent = "Type your average electricity bill to see your solar plan.";
+    } else {
+      $("headline").textContent = "Let's look at your roof together";
+      $("subline").textContent = "About " + areaText(Math.ceil(CONFIG.minKw * 1000 / state.watts) * CONFIG.sqftPerPanel) + " of shadow-free area is needed for " + CONFIG.minKw + " kW.";
+    }
+
+    var note = $("note");
+    if (r.units > 0 && r.kw === 0) {
+      note.textContent = "This area is a little small for a standard system. An elevated structure or a free site survey can often find more usable space.";
+      note.hidden = false;
+    } else if (has && r.roofMaxKw < r.neededKw) {
+      note.textContent = "Your usage needs about " + r.neededKw + " kW, but this roof area fits " + r.roofMaxKw + " kW. An elevated structure can help use more of your terrace.";
+      note.hidden = false;
+    } else {
+      note.hidden = true;
+    }
+
+    var max = Math.max(state.bill, 1);
+    $("barBefore").style.width = "100%";
+    $("barAfter").style.width = Math.max(3, r.billAfter / max * 100) + "%";
+    $("billBefore").textContent = inr(state.bill);
+    $("billAfter").textContent = inr(r.billAfter);
+    $("monthlySave").textContent = inr(state.bill - r.billAfter);
+
+    // Homes see prices; commercial and industrial systems are quoted after a site survey
+    var isHome = state.type === "home";
+    $("paybackTile").hidden = !isHome;
+    $("netTile").hidden = !isHome;
+    $("subsidyTile").classList.toggle("wide", !isHome);
+    if (isHome) {
+      $("cost").textContent = has ? moneyRange(r.priceLo, r.priceHi) : "—";
+      $("priceNote").textContent = techLabel() + " · depends on panel brand" +
+        (state.elevated ? " · includes elevated structure (₹" + fmtNum(CONFIG.elevatedPerKw) + "/kW)" : "");
+      $("subsidyLabel").textContent = "PM Surya Ghar subsidy";
+      $("subsidy").textContent = r.subsidy ? "− " + money(r.subsidy) : "—";
+      $("net").textContent = has ? moneyRange(r.netLo, r.netHi) : "—";
+      if (has && r.yearlySaving > 0) {
+        var p1 = (r.netLo / r.yearlySaving).toFixed(1), p2 = (r.netHi / r.yearlySaving).toFixed(1);
+        $("payback").textContent = p1 === p2 ? p1 + " years" : p1 + " – " + p2 + " yrs";
+      } else {
+        $("payback").textContent = "—";
+      }
+    } else {
+      $("cost").textContent = "Custom quote";
+      $("priceNote").textContent = techLabel() + " · priced after a free site survey";
+      $("subsidyLabel").textContent = "Tax benefit";
+      $("subsidy").textContent = "Ask us";
+    }
+    $("life").textContent = has ? money(r.life) : "—";
+    $("green").textContent = has ? (r.co2Kg / 1000).toFixed(1) + " t CO₂ ≈ " + fmtNum(r.co2Kg / CONFIG.co2KgPerTreePerYear) + " trees" : "—";
+
+    $("segNote").innerHTML = state.type === "home"
+      ? "Homes get the <b>PM Surya Ghar subsidy – up to ₹78,000</b>. We handle the full application."
+      : "Shops, schools, offices and factories. Bigger systems, faster payback.";
+    $("elevNote").textContent = "Raised panels keep your terrace usable underneath" +
+      (isHome ? " · +₹" + fmtNum(CONFIG.elevatedPerKw) + " per kW" : "");
+
+    var msg = [
+      "Hi Saanvika Solar, I used your solar calculator.",
+      "Type: " + (state.type === "home" ? "Home" : "Business"),
+      "Monthly bill: " + inr(state.bill),
+      "Roof area: " + areaText(state.roofSqft) + (state.elevated ? " (elevated structure)" : ""),
+      has ? "Suggested system: " + r.kw + " kW, " + r.panels + " x " + state.watts + " W " + techLabel() + " panels" : "Suggested system: needs a site survey",
+      has && isHome ? "Estimated price: " + moneyRange(r.priceLo, r.priceHi) : "",
+      "Please share a quote and book a free site survey."
+    ].filter(Boolean).join("\n");
+    $("waBtn").href = "https://wa.me/" + CONFIG.whatsappNumber + "?text=" + encodeURIComponent(msg);
+    $("callBtn").href = "tel:" + CONFIG.phoneNumber;
+    $("callLabel").textContent = "Call " + CONFIG.phoneDisplay;
+
+    $("disclaimer").textContent = "Estimate only. " +
+      (isHome ? "Price depends on panel brand, type and wattage. " : "Commercial and industrial prices are quoted after a site survey. ") +
+      "Assumes about " +
+      CONFIG.unitsPerKwPerMonth + " units per kW per month, ₹" + state.rate + "/unit and " + Math.round(CONFIG.yearlyTariffRise * 100) +
+      "% yearly tariff rise. Final system size, price and subsidy are confirmed after a free site survey, DISCOM approval and current PM Surya Ghar rules.";
+
+    drawRoof(r);
+  }
+
+  function syncBill() {
+    var cfg = CONFIG[state.type];
+    $("billNum").value = fmtNum(state.bill);
+    var range = $("billRange");
+    range.value = toSlider(state.bill, cfg.billMin, cfg.billMax);
+    setFill(range);
+  }
+  function syncRoof() {
+    $("roofNum").value = fmtNum(state.unit === "sqft" ? state.roofSqft : state.roofSqft / SQYD);
+    $("roofUnit").textContent = state.unit === "sqft" ? "sq ft" : "sq yd";
+    var range = $("roofRange");
+    range.value = toSlider(state.roofSqft, CONFIG.roofMinSqft, CONFIG.roofMaxSqft);
+    setFill(range);
+  }
+  function buildChips() {
+    var box = $("billChips");
+    box.innerHTML = "";
+    CONFIG[state.type].chips.forEach(function (v) {
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "chip";
+      b.textContent = money(v);
+      b.addEventListener("click", function () { state.bill = v; syncBill(); render(); });
+      box.appendChild(b);
+    });
+  }
+  function buildWatts() {
+    var sel = $("watts");
+    sel.innerHTML = "";
+    CONFIG.panels[state.tech].watts.forEach(function (w) {
+      var o = document.createElement("option");
+      o.value = String(w);
+      o.textContent = w + " W";
+      if (w === state.watts) o.selected = true;
+      sel.appendChild(o);
+    });
+  }
+  function press(groupSel, btn) {
+    all(groupSel).forEach(function (b) { b.setAttribute("aria-pressed", String(b === btn)); });
+  }
+
+  all(".seg-type button").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      if (state.type === btn.dataset.type) return;
+      state.type = btn.dataset.type;
+      press(".seg-type button", btn);
+      var cfg = CONFIG[state.type];
+      state.bill = cfg.billDefault;
+      state.rate = cfg.ratePerUnit;
+      if (state.type === "business" && state.roofSqft < 3000) state.roofSqft = 5000;
+      $("rate").value = state.rate;
+      buildChips(); syncBill(); syncRoof(); render();
+    });
+  });
+
+  all(".seg-panel button").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      if (state.tech === btn.dataset.tech) return;
+      state.tech = btn.dataset.tech;
+      state.watts = CONFIG.panels[state.tech].defaultWatts;
+      press(".seg-panel button", btn);
+      buildWatts(); render();
+    });
+  });
+  $("watts").addEventListener("change", function (e) { state.watts = Number(e.target.value); render(); });
+
+  all(".unit-toggle button").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      state.unit = btn.dataset.unit;
+      press(".unit-toggle button", btn);
+      syncRoof(); render();
+    });
+  });
+
+  $("billRange").addEventListener("input", function (e) {
+    var cfg = CONFIG[state.type];
+    state.bill = niceRound(fromSlider(+e.target.value, cfg.billMin, cfg.billMax));
+    $("billNum").value = fmtNum(state.bill);
+    setFill(e.target); render();
+  });
+  $("billNum").addEventListener("input", function (e) {
+    var cfg = CONFIG[state.type];
+    state.bill = parseNum(e.target.value);
+    var range = $("billRange");
+    range.value = toSlider(Math.max(state.bill, cfg.billMin), cfg.billMin, cfg.billMax);
+    setFill(range); render();
+  });
+  $("billNum").addEventListener("blur", function () { if (state.bill > 0) syncBill(); });
+
+  $("roofRange").addEventListener("input", function (e) {
+    state.roofSqft = niceRound(fromSlider(+e.target.value, CONFIG.roofMinSqft, CONFIG.roofMaxSqft));
+    $("roofNum").value = fmtNum(state.unit === "sqft" ? state.roofSqft : state.roofSqft / SQYD);
+    setFill(e.target); render();
+  });
+  $("roofNum").addEventListener("input", function (e) {
+    var v = parseNum(e.target.value);
+    state.roofSqft = state.unit === "sqft" ? v : v * SQYD;
+    var range = $("roofRange");
+    range.value = toSlider(Math.max(state.roofSqft, CONFIG.roofMinSqft), CONFIG.roofMinSqft, CONFIG.roofMaxSqft);
+    setFill(range); render();
+  });
+  $("roofNum").addEventListener("blur", function () { if (state.roofSqft > 0) syncRoof(); });
+
+  $("elevated").addEventListener("change", function (e) { state.elevated = e.target.checked; render(); });
+  $("rate").addEventListener("input", function (e) {
+    var v = parseFloat(e.target.value);
+    if (v > 0) { state.rate = v; render(); }
+  });
+
+  $("rate").value = state.rate;
+  buildChips(); buildWatts(); syncBill(); syncRoof(); render();
+})();
+</script>
+</body>
+</html>

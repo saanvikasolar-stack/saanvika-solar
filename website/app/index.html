@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en-IN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Saanvika Solar – Solar Savings Calculator</title>
+    <meta name="description" content="Check your rooftop solar size, PM Surya Ghar subsidy (up to ₹78,000) and monthly savings in 30 seconds. SAANVIKA Solar Systems, registered PM Surya Ghar vendor, Kakinada, Andhra Pradesh.">
+
+    <!-- Link preview (WhatsApp, Facebook, Telegram, SMS apps) -->
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="SAANVIKA Solar Systems">
+    <meta property="og:locale" content="en_IN">
+    <meta property="og:title" content="Saanvika Solar – Solar Savings Calculator">
+    <meta property="og:description" content="See your rooftop solar size, PM Surya Ghar subsidy (up to ₹78,000) and monthly savings in 30 seconds. Registered PM Surya Ghar vendor, Kakinada.">
+    <meta property="og:image" content="https://cdn.jsdelivr.net/gh/saanvikasolar-stack/saanvika-solar@dadf1c0a2d6cddd5d228aa913420b9a1e6834271/website/app/assets/og-image.jpg">
+    <meta property="og:image:type" content="image/jpeg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Saanvika Solar – Solar Savings Calculator. PM Surya Ghar registered vendor. Call 85198 33679.">
+    <meta name="twitter:card" content="summary_large_image">
+
+    <!-- Installable app -->
+    <link rel="manifest" href="./manifest.webmanifest">
+    <meta name="theme-color" content="#122E3E">
+    <meta name="application-name" content="Saanvika Solar">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Saanvika Solar">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <link rel="apple-touch-icon" href="https://cdn.jsdelivr.net/gh/saanvikasolar-stack/saanvika-solar@dadf1c0a2d6cddd5d228aa913420b9a1e6834271/website/app/assets/apple-touch-icon.png">
+    <link rel="icon" type="image/png" href="https://cdn.jsdelivr.net/gh/saanvikasolar-stack/saanvika-solar@dadf1c0a2d6cddd5d228aa913420b9a1e6834271/website/app/assets/favicon.png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Telugu:wght@500;700;800&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="appbar">
+        <img class="brand" src="https://cdn.jsdelivr.net/gh/saanvikasolar-stack/saanvika-solar@dadf1c0a2d6cddd5d228aa913420b9a1e6834271/website/app/assets/logo.png" alt="Saanvika Solar" width="1119" height="281">
+        <div class="appbar-actions">
+            <button type="button" class="pill-btn" id="installBtn" hidden>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>
+                Install app
+            </button>
+            <button type="button" class="icon-btn" id="shareBtn" aria-label="Share this calculator">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>
+            </button>
+            <a class="icon-btn call" href="tel:+918519833679" aria-label="Call Saanvika Solar">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2Z"/></svg>
+            </a>
+        </div>
+    </header>
+
+    <main class="wrap">
+        <noscript><p class="nojs">This calculator needs JavaScript. Open it in Chrome or Safari.</p></noscript>
+
+        <section class="hero" aria-labelledby="heroTitle">
+            <span class="vendor">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+                PM Surya Ghar registered vendor · MNRE
+            </span>
+            <h1 class="title te" id="heroTitle">సూర్యుడి వెలుగు... <span class="accent">మీ ఇంటి పొదుపు!</span></h1>
+            <p class="hero-en">Solar Savings Calculator</p>
+            <p class="lede">Enter your electricity bill and rooftop area. See the system your roof can hold, its price, your PM Surya Ghar subsidy and how fast it pays back.</p>
+            <ul class="proof" aria-label="Our track record">
+                <li><b>296</b><span>rooftop systems installed</span></li>
+                <li><b>290+</b><span>PM Surya Ghar subsidies redeemed</span></li>
+                <li><b>1 MW+</b><span>solar installed in Andhra Pradesh</span></li>
+            </ul>
+        </section>
+
+        <div class="grid">
+            <!-- Inputs -->
+            <section class="card" aria-label="Your details">
+                <div class="seg seg-type" role="group" aria-label="Customer type">
+                    <button type="button" data-type="home" aria-pressed="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M3 11 12 4l9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-5h4v5"/></svg>
+                        <span>Home<small>ఇల్లు</small></span>
+                    </button>
+                    <button type="button" data-type="business" aria-pressed="false">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M4 21V8l6-3v16"/><path d="M10 21V3l10 4v14"/><path d="M2 21h20M14 10h2M14 14h2M6 12h1M6 16h1"/></svg>
+                        <span>Business<small>వ్యాపారం</small></span>
+                    </button>
+                </div>
+                <p class="seg-note" id="segNote">Homes get the <b>PM Surya Ghar subsidy – up to ₹78,000</b>. We handle the full application.</p>
+
+                <div class="field">
+                    <div class="field-head">
+                        <label class="field-label" for="billNum">Monthly electricity bill<span class="te">నెలవారీ కరెంట్ బిల్</span></label>
+                        <div class="value-box"><span>₹</span><input id="billNum" inputmode="numeric" autocomplete="off" value="3,000"></div>
+                    </div>
+                    <input type="range" id="billRange" min="0" max="1000" step="1" value="458" aria-label="Monthly electricity bill">
+                    <div class="chips" id="billChips" aria-label="Common bill amounts"></div>
+                </div>
+
+                <div class="field">
+                    <div class="field-head">
+                        <label class="field-label" for="roofNum">Shadow-free rooftop area<span class="te">పైకప్పు విస్తీర్ణం</span></label>
+                        <div class="field-side">
+                            <div class="unit-toggle" role="group" aria-label="Area unit">
+                                <button type="button" data-unit="sqft" aria-pressed="true">sq ft</button>
+                                <button type="button" data-unit="sqyd" aria-pressed="false">sq yd <span class="te">(గజాలు)</span></button>
+                            </div>
+                            <div class="value-box"><input id="roofNum" inputmode="numeric" autocomplete="off" value="1,000"><span id="roofUnit">sq ft</span></div>
+                        </div>
+                    </div>
+                    <input type="range" id="roofRange" min="0" max="1000" step="1" value="404" aria-label="Rooftop area">
+                    <div class="roof" aria-hidden="true">
+                        <div class="roof-head"><span>Your roof · top view</span><b id="roofCaption"></b></div>
+                        <svg id="roofSvg" viewBox="0 0 320 160"></svg>
+                        <div class="legend">
+                            <span><i class="lg-panel"></i>Solar panels</span>
+                            <span><i class="lg-free"></i>Free terrace</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <div class="field-label" id="panelLabel">Solar panel type<span class="te">సోలార్ ప్యానెల్ రకం</span></div>
+                    <div class="seg seg-panel" role="group" aria-labelledby="panelLabel">
+                        <button type="button" data-tech="perc" aria-pressed="true"><span>Mono PERC<small>Best value</small></span></button>
+                        <button type="button" data-tech="topcon" aria-pressed="false"><span>TOPCon<small>Newer, higher wattage</small></span></button>
+                    </div>
+                    <div class="select-row"><label for="watts">Panel wattage</label><select id="watts"></select></div>
+                </div>
+
+                <div class="switch-row">
+                    <p>Elevated structure<span id="elevNote">Raised panels keep your terrace usable underneath</span></p>
+                    <label class="switch"><input type="checkbox" id="elevated" aria-label="Elevated structure"><span class="track"></span></label>
+                </div>
+
+                <details class="adv">
+                    <summary>Adjust electricity rate</summary>
+                    <div class="row"><label for="rate">Average cost per unit (₹/kWh)</label><input id="rate" type="number" min="1" max="30" step="0.1" value="7.5"></div>
+                </details>
+            </section>
+
+            <!-- Results -->
+            <section class="card result" aria-live="polite" aria-label="Your solar estimate">
+                <h2>Your solar plan</h2>
+                <div class="hero-row">
+                    <div class="gauge">
+                        <svg viewBox="0 0 120 120" aria-hidden="true">
+                            <defs><linearGradient id="gaugeGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E9A461"/><stop offset="1" stop-color="#EB770D"/></linearGradient></defs>
+                            <circle class="ring-bg" cx="60" cy="60" r="52" fill="none" stroke-width="10"/>
+                            <circle class="ring" id="ring" cx="60" cy="60" r="52" fill="none" stroke-width="10" stroke-linecap="round" stroke-dasharray="326.73" stroke-dashoffset="0"/>
+                        </svg>
+                        <div class="center"><div class="kw" id="kw">3<small>kW</small></div><div class="cov" id="cov">100% covered</div></div>
+                    </div>
+                    <div class="hero-text">
+                        <p class="big" id="headline">3 kW rooftop solar</p>
+                        <p class="small" id="subline">6 × 545 W Mono PERC panels</p>
+                    </div>
+                </div>
+                <div class="note" id="note" hidden></div>
+
+                <div class="bills">
+                    <div class="bill before"><span>Bill today</span><div class="bar"><i id="barBefore"></i></div><b id="billBefore">₹3,000</b></div>
+                    <div class="bill after"><span>With solar</span><div class="bar"><i id="barAfter"></i></div><b id="billAfter">₹100</b></div>
+                </div>
+                <p class="saves">You save about <b id="monthlySave">₹2,900</b> every month</p>
+
+                <div class="stats">
+                    <div class="stat wide"><span>System price<em id="priceNote">Mono PERC · depends on panel brand</em></span><b id="cost">₹2.00 – 2.10 lakh</b></div>
+                    <div class="stat subsidy" id="subsidyTile"><span id="subsidyLabel">PM Surya Ghar subsidy</span><b id="subsidy">− ₹78,000</b></div>
+                    <div class="stat" id="paybackTile"><span>Money back in</span><b id="payback">—</b></div>
+                    <div class="stat wide" id="netTile"><span>Your cost after subsidy</span><b id="net">—</b></div>
+                    <div class="stat highlight wide"><span>Total savings over 25 years</span><b id="life">—</b></div>
+                    <div class="stat wide"><span>Clean energy every year</span><b id="green">—</b></div>
+                </div>
+
+                <div class="cta">
+                    <a class="btn primary" id="waBtn" href="https://wa.me/918519833679" target="_blank" rel="noopener">
+                        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.9 9.9 0 0 0 4.74 1.21h.01c5.46 0 9.91-4.45 9.91-9.91A9.9 9.9 0 0 0 12.04 2Zm5.8 14.03c-.24.68-1.42 1.3-1.96 1.35-.5.05-1.13.07-1.83-.11a16.7 16.7 0 0 1-1.66-.61c-2.92-1.26-4.83-4.2-4.97-4.4-.15-.2-1.19-1.58-1.19-3.01 0-1.43.75-2.13 1.02-2.43.27-.29.58-.37.78-.37h.56c.18.01.42-.07.66.5.24.58.83 2.01.9 2.15.08.15.12.32.02.51-.1.2-.15.32-.29.49-.15.17-.31.39-.44.52-.15.15-.3.3-.13.6.17.29.76 1.26 1.64 2.04 1.13 1.01 2.08 1.32 2.37 1.47.3.15.47.12.64-.07.17-.2.73-.85.93-1.14.2-.29.39-.24.66-.15.27.1 1.7.8 1.99.95.29.15.49.22.56.34.07.12.07.7-.17 1.38Z"/></svg>
+                        WhatsApp this plan
+                    </a>
+                    <a class="btn ghost" id="callBtn" href="tel:+918519833679">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2Z"/></svg>
+                        Call 85198 33679
+                    </a>
+                    <p class="cta-te te">ఈరోజే సోలార్‌కు మారండి!</p>
+                </div>
+                <p class="disclaimer" id="disclaimer">Estimate only. Final system size, price and subsidy are confirmed after a free site survey.</p>
+            </section>
+        </div>
+
+        <section class="why" aria-labelledby="whyTitle">
+            <h2 id="whyTitle">Why homes in Andhra Pradesh choose Saanvika</h2>
+            <div class="why-grid">
+                <article>
+                    <h3>PM Surya Ghar, start to finish</h3>
+                    <p>Portal registration, DISCOM approval, net meter, inspection and your subsidy claim. We do the paperwork.</p>
+                </article>
+                <article>
+                    <h3>Free site survey</h3>
+                    <p>We check your roof, shade and wiring before we quote, so the price you get is the price you pay.</p>
+                </article>
+                <article>
+                    <h3>Service after installation</h3>
+                    <p>Panel cleaning, inverter checks and generation monitoring. Maintenance visits from ₹1,500.</p>
+                </article>
+            </div>
+        </section>
+
+        <section class="contact card" aria-labelledby="contactTitle">
+            <h2 id="contactTitle">Talk to us <span class="te">మరిన్ని వివరాలకు సంప్రదించండి</span></h2>
+            <div class="contact-grid">
+                <a class="contact-item" href="tel:+918519833679">
+                    <span class="ci-label">Call</span><span class="ci-value">85198 33679</span>
+                </a>
+                <a class="contact-item" href="tel:+919885315789">
+                    <span class="ci-label">Call</span><span class="ci-value">98853 15789</span>
+                </a>
+                <a class="contact-item" href="https://wa.me/918519833679" target="_blank" rel="noopener">
+                    <span class="ci-label">WhatsApp</span><span class="ci-value">85198 33679</span>
+                </a>
+                <a class="contact-item" href="mailto:saanvikasolar@gmail.com">
+                    <span class="ci-label">Email</span><span class="ci-value">saanvikasolar@gmail.com</span>
+                </a>
+                <a class="contact-item wide" href="https://share.google/7D7AnSnXjt6kXBH2w" target="_blank" rel="noopener">
+                    <span class="ci-label">Office · open in Google Maps</span>
+                    <span class="ci-value addr">78, Apic Colony, Rayudupalem, Ramanayyapeta, Sarpavaram, Kakinada, Andhra Pradesh 533005</span>
+                </a>
+                <a class="contact-item wide" href="https://www.saanvikasolar.in" target="_blank" rel="noopener">
+                    <span class="ci-label">Website</span><span class="ci-value">www.saanvikasolar.in</span>
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="foot">
+        <b>SAANVIKA Solar Systems</b> · Rooftop solar for homes, shops and factories · Kakinada, Andhra Pradesh
+    </footer>
+
+    <div class="ios-hint" id="iosHint" hidden>
+        <p>Add this calculator to your home screen: tap <b>Share</b>, then <b>Add to Home Screen</b>.</p>
+        <button type="button" id="iosHintClose" aria-label="Close">×</button>
+    </div>
+
+    <script type="module" src="./src/main.ts"></script>
+</body>
+</html>
