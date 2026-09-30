@@ -13,8 +13,9 @@ home-screen icon, and works offline after the first visit.
 | App (hosted on AppDeploy) | https://saanvika-solar-calculator-ygvfs9.v2.appdeploy.ai/ |
 | AppDeploy app id | `saanvika-solar-calculator-ygvfs9` |
 
-The `/calculator` redirect lives in the Wix site's SEO redirects. When the domain moves to the new Wix site,
-create the same redirect there (from `/calculator` to the app link above).
+The `/calculator` redirect lives in the SEO redirects of the Wix site that holds saanvikasolar.in (the new site,
+`e2ff5c06…`, since 30 Sep 2026). If the domain ever moves to another Wix site, create the same redirect there
+(from `/calculator` to the app link above).
 
 ## What customers see
 
@@ -23,7 +24,7 @@ create the same redirect there (from `/calculator` to the app link above).
 - The full calculator: bill, roof area (sq ft or sq yd), Home or Business, Mono PERC or TOPCon, wattage, elevated structure
 - Homes see price range, PM Surya Ghar subsidy, cost after subsidy and payback. Business shows "Custom quote"
 - **WhatsApp this plan** sends their numbers to 85198 33679
-- Reasons to choose Saanvika, and a contact card (both numbers, WhatsApp, email, office address with Google Maps, website)
+- Reasons to choose Saanvika, and a contact card (both numbers, WhatsApp, email, office address linked to the office's own Google Maps share link, website)
 
 ## WhatsApp link preview
 
