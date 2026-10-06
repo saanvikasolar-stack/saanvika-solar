@@ -16,3 +16,15 @@ ffmpeg -framerate 30 -i frames/%05d.jpg -f lavfi -i anullsrc=r=48000:cl=stereo \
 
 Edit copy, timings and colours in `reel.html` (every animation delay is the scene time in seconds).
 Photos in `img/h*_hi.jpg` are AI-generated (Canva); regenerate and drop in replacements with the same names.
+
+## Venky Mama Ep. 1 (comedy reel, v1)
+
+`Saanvika_VenkyMama_Ep1_v1.mp4` — 30.5 s with synthesized SFX; `_muted.mp4` for trending-audio-only posting; `_cover.jpg`; caption + notes in `Saanvika_VenkyMama_Ep1_caption_and_notes.md`.
+
+Source: `src/venky.html` (timeline), `src/shots/s01..s12.jpg` (AI stills, consistent characters), `src/sfx/` (SFX synthesized by `gen_sfx.py`, cue list in `mix_sfx.py`), `src/final_concept.json` (full shot list + image prompts).
+
+```bash
+cd reel/src && python3 sfx/gen_sfx.py && python3 mix_sfx.py 30.5 sfx_mix.wav
+for r in "0 229" "229 458" "458 687" "687 915"; do set -- $r; REEL=venky.html node cap.js run $1 $2 & done; wait
+ffmpeg -framerate 30 -i frames/%05d.jpg -i sfx_mix.wav -vf "fade=t=out:st=29.9:d=0.6,format=yuv420p" -c:v libx264 -crf 18 -c:a aac -shortest -movflags +faststart -t 30.5 out.mp4
+```

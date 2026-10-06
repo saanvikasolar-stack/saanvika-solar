@@ -7,7 +7,7 @@ const FPS = 30;
   const mode = process.argv[2];
   const browser = await chromium.launch();
   const page = await browser.newPage({ viewport: { width: 1080, height: 1920 }, deviceScaleFactor: 1 });
-  await page.goto('file://' + path.join(__dirname, 'reel.html'));
+  await page.goto('file://' + path.join(__dirname, process.env.REEL || 'reel.html'));
   await page.evaluate(() => document.fonts.ready);
   await page.waitForTimeout(400);
   if (mode === 'test') {
