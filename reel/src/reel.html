@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="te">
+<head>
+<meta charset="utf-8">
+<title>Saanvika Solar Reel</title>
+<style>
+@font-face{font-family:'Tel';src:url(fonts/NotoSansTelugu-800.ttf);font-weight:800}
+@font-face{font-family:'Tel';src:url(fonts/NotoSansTelugu-700.ttf);font-weight:700}
+@font-face{font-family:'Pop';src:url(fonts/Poppins-800.ttf);font-weight:800}
+@font-face{font-family:'Pop';src:url(fonts/Poppins-600.ttf);font-weight:600}
+*{box-sizing:border-box;margin:0;padding:0;animation-play-state:paused!important}
+html,body{width:1080px;height:1920px;overflow:hidden;background:#0F2A44}
+body{font-family:'Pop',sans-serif;color:#0F2A44;position:relative}
+.te{font-family:'Tel',sans-serif;font-weight:800}
+.stage{position:absolute;inset:0;overflow:hidden}
+.scene{position:absolute;inset:0;opacity:0}
+/* photo treatment */
+.photo{position:absolute;inset:0;overflow:hidden}
+.photo img{position:absolute;left:0;top:0;width:1080px;height:1920px;object-fit:cover;transform-origin:50% 45%}
+.grain{position:absolute;inset:0;pointer-events:none;opacity:.13;mix-blend-mode:overlay;
+ background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='300'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 .9 0'/></filter><rect width='300' height='300' filter='url(%23n)'/></svg>")}
+.vig{position:absolute;inset:0;background:radial-gradient(ellipse 80% 70% at 50% 45%,rgba(0,0,0,0) 45%,rgba(5,15,30,.55) 100%)}
+.shadeB{position:absolute;left:0;right:0;bottom:0;height:900px;background:linear-gradient(180deg,rgba(8,20,36,0) 0%,rgba(8,20,36,.78) 70%,rgba(8,20,36,.9) 100%)}
+.shadeT{position:absolute;left:0;right:0;top:0;height:620px;background:linear-gradient(180deg,rgba(8,20,36,.72) 0%,rgba(8,20,36,0) 100%)}
+/* brand gradient bg */
+.brand{position:absolute;inset:0;background:linear-gradient(180deg,#BFE3F8 0%,#E6F4FC 38%,#FFF7EE 75%,#FFEBD6 100%)}
+.sunglow{position:absolute;left:-200px;top:-420px;width:1480px;height:1100px;background:radial-gradient(circle at 50% 40%,rgba(255,196,90,.85) 0%,rgba(255,210,120,.35) 28%,rgba(255,230,180,0) 60%)}
+.rays{position:absolute;left:-460px;top:-900px;width:2000px;height:2000px;border-radius:50%;
+ background:repeating-conic-gradient(from 0deg,rgba(255,255,255,.55) 0deg 6deg,rgba(255,255,255,0) 6deg 16deg);
+ -webkit-mask:radial-gradient(circle,rgba(0,0,0,.9) 0%,rgba(0,0,0,.35) 35%,rgba(0,0,0,0) 62%);mask:radial-gradient(circle,rgba(0,0,0,.9) 0%,rgba(0,0,0,.35) 35%,rgba(0,0,0,0) 62%);
+ animation:spin 70s linear infinite both}
+.grid{position:absolute;left:-200px;right:-200px;bottom:-80px;height:620px;opacity:.16;transform:perspective(900px) rotateX(62deg);transform-origin:50% 100%;
+ background:linear-gradient(90deg,#0F2A44 2px,transparent 2px) 0 0/80px 80px,linear-gradient(0deg,#0F2A44 2px,transparent 2px) 0 0/80px 80px;
+ -webkit-mask:linear-gradient(180deg,transparent 0%,#000 60%);mask:linear-gradient(180deg,transparent 0%,#000 60%)}
+/* type */
+.h{position:absolute;left:60px;right:60px;text-align:center;line-height:1.18;letter-spacing:-.5px}
+.w{display:inline-block;will-change:transform}
+.orange{color:#F07F1A}.navy{color:#0F2A44}.white{color:#fff}.red{color:#D7262E}.grey{color:#46607a}
+.tshadow{text-shadow:0 6px 30px rgba(0,0,0,.55),0 2px 6px rgba(0,0,0,.45)}
+.pill{display:inline-block;border-radius:60px;padding:14px 36px;font-weight:800;border:5px solid #fff;box-shadow:0 14px 34px rgba(15,42,68,.28)}
+.pill.o{background:#F07F1A;color:#fff}.pill.n{background:#0F2A44;color:#fff}.pill.w{background:#fff;color:#0F2A44}
+.card{position:absolute;background:#fff;border-radius:36px;box-shadow:0 30px 70px rgba(15,42,68,.30)}
+.brush{display:inline-block;background:#F07F1A;color:#fff;padding:22px 54px;transform:rotate(-2deg);
+ clip-path:polygon(1% 12%,8% 2%,30% 6%,52% 0%,75% 5%,97% 2%,100% 20%,98% 55%,100% 86%,94% 100%,70% 95%,48% 100%,24% 94%,4% 99%,0% 80%,2% 45%)}
+.logoPill{position:absolute;background:#fff;border-radius:60px;padding:14px 34px;box-shadow:0 18px 40px rgba(15,42,68,.22);display:flex;align-items:center;gap:18px}
+.logoPill img{display:block}
+/* keyframes */
+@keyframes fin{from{opacity:0}to{opacity:1}}
+@keyframes fout{from{opacity:1}to{opacity:0}}
+@keyframes pop{0%{opacity:0;transform:scale(.4) rotate(var(--r,0deg)) translateY(30px)}60%{opacity:1;transform:scale(1.08) rotate(var(--r,0deg)) translateY(-4px)}100%{opacity:1;transform:scale(1) rotate(var(--r,0deg)) translateY(0)}}
+@keyframes rise{0%{opacity:0;transform:translateY(70px)}100%{opacity:1;transform:translateY(0)}}
+@keyframes riseR{0%{opacity:0;transform:translateY(70px) rotate(var(--r,0deg))}100%{opacity:1;transform:translateY(0) rotate(var(--r,0deg))}}
+@keyframes slideUp{0%{transform:translateY(900px) rotate(-6deg);opacity:0}100%{transform:translateY(0) rotate(-3deg);opacity:1}}
+@keyframes slam{0%{opacity:0;transform:scale(3) rotate(-14deg)}55%{opacity:1;transform:scale(.92) rotate(-14deg)}75%{transform:scale(1.06) rotate(-14deg)}100%{opacity:1;transform:scale(1) rotate(-14deg)}}
+@keyframes shake{0%,100%{transform:translate(0,0) rotate(-3deg)}20%{transform:translate(-14px,4px) rotate(-5deg)}40%{transform:translate(14px,-6px) rotate(-1deg)}60%{transform:translate(-10px,2px) rotate(-4deg)}80%{transform:translate(10px,-2px) rotate(-2deg)}}
+@keyframes fly{0%{transform:translate(0,0) rotate(-3deg);opacity:1}100%{transform:translate(-1400px,500px) rotate(-40deg);opacity:0}}
+@keyframes kbIn{from{transform:scale(1.04) translate(0,0)}to{transform:scale(1.16) translate(-1.5%,-2%)}}
+@keyframes kbOut{from{transform:scale(1.16) translate(1%,1.5%)}to{transform:scale(1.04) translate(0,0)}}
+@keyframes kbPan{from{transform:scale(1.12) translate(2%,0)}to{transform:scale(1.12) translate(-2%,-1%)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+@keyframes ripple{0%{transform:scale(.2);opacity:.9}100%{transform:scale(2.4);opacity:0}}
+@keyframes chipOn{to{background:#F07F1A;color:#fff;border-color:#F07F1A}}
+@keyframes phoneIn{0%{transform:translateY(1300px) rotate(8deg)}100%{transform:translateY(0) rotate(0)}}
+@keyframes screenUp{0%{transform:translateY(100%)}100%{transform:translateY(0)}}
+@keyframes scrollRes{from{transform:translateY(0)}to{transform:translateY(-150px)}}
+@keyframes strike{from{width:0}to{width:100%}}
+@keyframes wipe{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
+@keyframes blink{0%,45%{opacity:1}50%,95%{opacity:.25}100%{opacity:1}}
+@keyframes floaty{0%,100%{transform:translateY(0) rotate(var(--r,0deg))}50%{transform:translateY(-10px) rotate(var(--r,0deg))}}
+</style>
+</head>
+<body>
+<div class="stage">
+
+<!-- ================= SCENE 1 · HOOK 0–4.2s ================= -->
+<div class="scene" id="s1" style="opacity:1;animation:fout .3s 3.95s forwards">
+  <div class="photo"><img src="img/h1_bill_hi.jpg" style="animation:kbIn 4.3s 0s linear both;filter:saturate(.72) contrast(1.08) brightness(.92)"><div class="vig"></div><div class="shadeT"></div><div class="shadeB"></div><div class="grain"></div></div>
+  <div class="h" style="top:170px">
+    <div class="te white tshadow" style="font-size:86px"><span class="w" style="animation:pop .45s .35s both">కరెంటు</span> <span class="w" style="animation:pop .45s .55s both">బిల్లు</span> <span class="w" style="animation:pop .45s .75s both">చూస్తే…</span></div>
+    <div class="te orange tshadow" style="font-size:112px;margin-top:6px"><span class="w" style="animation:pop .5s 1.45s both;--r:-2deg">గుండె గుభేల్?</span></div>
+  </div>
+  <!-- bill card -->
+  <div class="card" id="bill" style="left:150px;top:1120px;width:780px;padding:40px 46px;transform:rotate(-3deg);animation:slideUp .55s .25s cubic-bezier(.2,.9,.3,1.1) both,shake .3s 3.35s both,fly .45s 3.65s ease-in forwards">
+    <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:3px dashed #d7dee6;padding-bottom:18px">
+      <div style="font-size:30px;font-weight:800;letter-spacing:3px;color:#46607a">ELECTRICITY BILL</div>
+      <div class="te" style="font-size:28px;color:#46607a;font-weight:700">ఈ నెల</div>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-top:26px">
+      <div><div style="font-size:28px;color:#46607a;font-weight:600">Amount due</div><div class="red" style="font-size:118px;font-weight:800;line-height:1">₹3,240</div></div>
+      <div style="text-align:right"><div style="font-size:26px;color:#46607a;font-weight:600">Units</div><div class="navy" style="font-size:54px;font-weight:800;line-height:1.1">412</div></div>
+    </div>
+    <div style="margin-top:22px;height:14px;border-radius:7px;background:#eef2f6;overflow:hidden"><div style="width:86%;height:100%;background:linear-gradient(90deg,#F07F1A,#D7262E)"></div></div>
+  </div>
+  <!-- red stamp -->
+  <div class="te" style="position:absolute;left:470px;top:1020px;padding:12px 34px;border:10px solid #D7262E;color:#D7262E;font-size:84px;border-radius:22px;background:rgba(255,255,255,.88);box-shadow:0 20px 50px rgba(0,0,0,.35);transform-origin:50% 50%;animation:slam .42s 1.05s cubic-bezier(.2,.9,.3,1) both,fout .25s 3.7s forwards">ప్రతి నెలా!</div>
+</div>
+
+<!-- ================= SCENE 2 · TURN 4.2–10.5s ================= -->
+<div class="scene" id="s2" style="animation:fin .25s 4.1s both,fout .35s 10.15s forwards">
+  <div class="photo"><img src="img/h2_family_hi.jpg" style="animation:kbOut 6.5s 4.1s linear both;filter:saturate(1.08) contrast(1.04)"><div class="vig" style="opacity:.6"></div><div class="shadeT" style="height:720px"></div><div class="shadeB" style="height:1050px"></div><div class="grain"></div></div>
+  <div class="h" style="top:270px">
+    <div class="te white tshadow" style="font-size:78px"><span class="w" style="animation:pop .45s 4.45s both">సోలార్</span> <span class="w" style="animation:pop .45s 4.65s both">పెట్టాక…</span></div>
+    <div class="te orange tshadow" style="font-size:96px;margin-top:4px"><span class="w" style="animation:pop .5s 5.0s both;--r:-1.5deg">అదే బిల్లు</span></div>
+  </div>
+  <!-- counter card -->
+  <div class="card" style="left:120px;top:1150px;width:840px;padding:36px 48px 34px;animation:rise .5s 5.3s cubic-bezier(.2,.9,.3,1.1) both">
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <div>
+        <div style="font-size:26px;color:#46607a;font-weight:600">Before</div>
+        <div style="position:relative;display:inline-block;font-size:72px;font-weight:800;color:#8a9bb0;line-height:1.1">₹3,240<div style="position:absolute;left:0;top:50%;height:9px;background:#D7262E;border-radius:5px;animation:strike .35s 6.1s both"></div></div>
+      </div>
+      <div style="font-size:70px;color:#F07F1A;font-weight:800;animation:pop .4s 6.3s both">➜</div>
+      <div style="text-align:right">
+        <div style="font-size:26px;color:#46607a;font-weight:600">With solar*</div>
+        <div id="cnt" style="font-size:120px;font-weight:800;color:#0F2A44;line-height:1;animation:pop .4s 6.0s both">₹3,240</div>
+      </div>
+    </div>
+    <div style="margin-top:16px;font-size:24px;color:#46607a;font-weight:600">*Sample estimate · 3 kW home system · Kakinada</div>
+  </div>
+  <div style="position:absolute;left:0;right:0;top:1500px;text-align:center;animation:riseR .5s 8.0s cubic-bezier(.2,.9,.3,1.1) both;--r:-2deg">
+    <div class="brush te" style="font-size:74px">నెలకు ₹3,000+ ఆదా*</div>
+  </div>
+</div>
+
+<!-- ================= SCENE 3 · PROOF 10.5–21s ================= -->
+<div class="scene" id="s3" style="animation:fin .3s 10.4s both,fout .35s 20.65s forwards">
+  <div class="photo"><img src="img/h3_phone_hi.jpg" style="animation:kbPan 10.6s 10.4s linear both"><div class="shadeT" style="height:760px"></div><div class="shadeB" style="height:1300px;background:linear-gradient(180deg,rgba(8,20,36,0) 0%,rgba(8,20,36,.55) 40%,rgba(8,20,36,.85) 100%)"></div><div class="grain"></div></div>
+  <div class="h" style="top:265px">
+    <div class="te white tshadow" style="font-size:84px"><span class="w" style="animation:pop .45s 10.7s both">మీ ఇంటికి</span> <span class="w orange" style="animation:pop .45s 10.9s both">ఎంత?</span></div>
+    <div class="te white tshadow" style="font-size:54px;margin-top:10px;font-weight:700"><span class="w" style="animation:pop .45s 11.5s both">30 సెకన్లలో చూసేయండి</span></div>
+  </div>
+  <!-- phone -->
+  <div style="position:absolute;left:52px;top:760px;width:600px;height:1180px;animation:phoneIn .7s 11.0s cubic-bezier(.2,.9,.3,1.05) both">
+    <div style="position:absolute;inset:0;background:#0b1a2b;border-radius:70px;box-shadow:0 40px 90px rgba(0,0,0,.55),inset 0 0 0 4px #2a3b50"></div>
+    <div style="position:absolute;left:18px;top:18px;right:18px;bottom:18px;border-radius:54px;overflow:hidden;background:#F6FAFD">
+      <div style="position:absolute;left:50%;top:14px;width:150px;height:34px;margin-left:-75px;background:#0b1a2b;border-radius:20px;z-index:5"></div>
+      <!-- screen A: input -->
+      <div style="position:absolute;inset:0;padding:72px 30px 30px;font-size:24px">
+        <div style="display:flex;align-items:center;gap:12px"><img src="img/logo_sq.png" style="width:52px;height:52px"><div><div style="font-weight:800;font-size:24px;color:#0F2A44">Saanvika Solar</div><div style="font-size:18px;color:#46607a;font-weight:600">Savings Calculator</div></div></div>
+        <div class="te" style="font-size:36px;color:#0F2A44;margin-top:40px;line-height:1.3">మీ నెల కరెంటు బిల్లు ఎంత?</div>
+        <div style="display:flex;flex-wrap:wrap;gap:14px;margin-top:22px">
+          <div style="padding:16px 26px;border:3px solid #cfd9e4;border-radius:40px;font-weight:800;color:#0F2A44;font-size:30px">₹1,500</div>
+          <div style="position:relative;padding:16px 26px;border:3px solid #cfd9e4;border-radius:40px;font-weight:800;color:#0F2A44;font-size:30px;animation:chipOn .2s 12.35s forwards">₹3,000<div style="position:absolute;left:50%;top:50%;width:90px;height:90px;margin:-45px 0 0 -45px;border-radius:50%;background:rgba(240,127,26,.45);animation:ripple .6s 12.2s ease-out both"></div></div>
+          <div style="padding:16px 26px;border:3px solid #cfd9e4;border-radius:40px;font-weight:800;color:#0F2A44;font-size:30px">₹5,000</div>
+          <div style="padding:16px 26px;border:3px solid #cfd9e4;border-radius:40px;font-weight:800;color:#0F2A44;font-size:30px">₹8,000+</div>
+        </div>
+        <div class="te" style="font-size:30px;color:#0F2A44;margin-top:36px;font-weight:700">ఇల్లు రకం</div>
+        <div style="display:flex;gap:14px;margin-top:14px"><div style="padding:14px 24px;border-radius:40px;background:#0F2A44;color:#fff;font-weight:800;font-size:26px">Own house ✓</div><div style="padding:14px 24px;border:3px solid #cfd9e4;border-radius:40px;font-weight:800;color:#0F2A44;font-size:26px">Apartment</div></div>
+        <div style="margin-top:44px;background:#F07F1A;color:#fff;border-radius:40px;padding:22px;text-align:center;font-weight:800;font-size:30px;box-shadow:0 12px 30px rgba(240,127,26,.4)">Calculate my savings ▸</div>
+      </div>
+      <!-- screen B: results -->
+      <div style="position:absolute;inset:0;background:#F6FAFD;animation:screenUp .5s 13.3s cubic-bezier(.2,.9,.3,1) both">
+        <div style="position:absolute;inset:0;padding:72px 30px 30px;animation:scrollRes 6s 14.5s linear both">
+          <div style="display:flex;align-items:center;gap:12px"><img src="img/logo_sq.png" style="width:52px;height:52px"><div style="font-weight:800;font-size:24px;color:#0F2A44">Your solar plan</div></div>
+          <div style="margin-top:26px;background:#0F2A44;color:#fff;border-radius:32px;padding:26px 28px">
+            <div style="font-size:20px;opacity:.8;font-weight:600">Recommended system</div>
+            <div style="font-size:66px;font-weight:800;line-height:1.05">3 kW <span style="font-size:28px;opacity:.85">rooftop</span></div>
+            <div class="te" style="font-size:22px;margin-top:8px;font-weight:700;opacity:.9">నెలకు ~360 యూనిట్లు</div>
+          </div>
+          <div style="display:flex;gap:14px;margin-top:16px">
+            <div style="flex:1;background:#fff;border-radius:28px;padding:20px;box-shadow:0 8px 24px rgba(15,42,68,.08)"><div style="font-size:18px;color:#46607a;font-weight:600">Est. cost</div><div style="font-size:40px;font-weight:800;color:#0F2A44">₹1.8L</div></div>
+            <div style="flex:1;background:#FFF1E3;border-radius:28px;padding:20px"><div style="font-size:18px;color:#a65a10;font-weight:600">Subsidy up to</div><div style="font-size:40px;font-weight:800;color:#F07F1A">₹78,000*</div></div>
+          </div>
+          <div style="display:flex;gap:14px;margin-top:14px">
+            <div style="flex:1;background:#E8F7EE;border-radius:28px;padding:20px"><div style="font-size:18px;color:#1d7a46;font-weight:600">Monthly saving</div><div style="font-size:40px;font-weight:800;color:#1d7a46">~₹3,000*</div></div>
+            <div style="flex:1;background:#fff;border-radius:28px;padding:20px;box-shadow:0 8px 24px rgba(15,42,68,.08)"><div style="font-size:18px;color:#46607a;font-weight:600">Payback</div><div style="font-size:40px;font-weight:800;color:#0F2A44">~4 yrs*</div></div>
+          </div>
+          <div style="margin-top:18px;background:#F07F1A;color:#fff;border-radius:40px;padding:20px;text-align:center;font-weight:800;font-size:28px">Book free site survey ▸</div>
+          <div style="margin-top:14px;font-size:16px;color:#46607a;font-weight:600;line-height:1.4">*Estimates. Final price, subsidy and sizing depend on site survey, approvals and scheme rules.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- stickers -->
+  <div class="pill o te" style="position:absolute;left:640px;top:880px;font-size:50px;animation:pop .45s 13.9s both;--r:4deg">3 kW ☀</div>
+  <div class="pill n te" style="position:absolute;left:600px;top:1030px;font-size:38px;line-height:1.25;text-align:center;animation:pop .45s 15.2s both;--r:-3deg">సబ్సిడీ<br><span style="font-size:48px;color:#FFC46B">up to ₹78,000*</span></div>
+  <div class="pill w te" style="position:absolute;left:630px;top:1300px;font-size:38px;animation:pop .45s 16.4s both;--r:3deg">పేబ్యాక్ ~4 ఏళ్ళు*</div>
+  <div class="pill o" style="position:absolute;left:640px;top:1470px;font-size:36px;animation:pop .45s 17.8s both;--r:-2deg">🔗 Link in bio</div>
+  <div style="position:absolute;left:640px;width:330px;top:1600px;text-align:left;color:#fff;font-size:21px;line-height:1.35;font-weight:600;opacity:.9;animation:fin .4s 14s both;text-shadow:0 2px 8px rgba(0,0,0,.7)">*Sample estimate. Final figures depend on site survey, approvals &amp; scheme rules.</div>
+</div>
+
+<!-- ================= SCENE 4 · TRUST 21–29.5s ================= -->
+<div class="scene" id="s4" style="animation:fin .3s 20.9s both,fout .35s 29.15s forwards">
+  <div class="brand"></div><div class="sunglow"></div><div class="rays"></div><div class="grid"></div>
+  <div style="position:absolute;left:70px;top:190px;width:430px;height:600px;background:#fff;padding:14px;border-radius:26px;box-shadow:0 28px 60px rgba(15,42,68,.3);animation:riseR .55s 21.1s cubic-bezier(.2,.9,.3,1.1) both;--r:-5deg"><img src="img/h4_installer_hi.jpg" style="width:100%;height:100%;object-fit:cover;object-position:50% 30%;border-radius:16px"></div>
+  <div style="position:absolute;left:570px;top:300px;width:430px;height:600px;background:#fff;padding:14px;border-radius:26px;box-shadow:0 28px 60px rgba(15,42,68,.3);animation:riseR .55s 21.5s cubic-bezier(.2,.9,.3,1.1) both;--r:4deg"><img src="img/h5_shop_hi.jpg" style="width:100%;height:100%;object-fit:cover;object-position:50% 35%;border-radius:16px"></div>
+  <div class="h" style="top:990px">
+    <div class="te navy" style="font-size:74px"><span class="w" style="animation:pop .45s 22.0s both">ఇళ్లకీ</span> <span class="w orange" style="animation:pop .4s 22.25s both">✓</span>&nbsp; <span class="w" style="animation:pop .45s 22.5s both">షాపులకీ</span> <span class="w orange" style="animation:pop .4s 22.75s both">✓</span></div>
+    <div class="te navy" style="font-size:74px;margin-top:4px"><span class="w" style="animation:pop .45s 23.0s both">బిజినెస్‌లకీ</span> <span class="w orange" style="animation:pop .4s 23.25s both">✓</span></div>
+  </div>
+  <div style="position:absolute;left:60px;right:60px;top:1230px;display:flex;gap:22px">
+    <div class="card" style="position:relative;flex:1;padding:26px 10px;text-align:center;animation:rise .45s 23.8s both"><div id="c1" style="font-size:78px;font-weight:800;color:#F07F1A;line-height:1">0</div><div class="te navy" style="font-size:30px;margin-top:8px;font-weight:700">సిస్టమ్స్</div></div>
+    <div class="card" style="position:relative;flex:1;padding:26px 10px;text-align:center;animation:rise .45s 24.0s both"><div id="c2" style="font-size:78px;font-weight:800;color:#F07F1A;line-height:1">0</div><div class="te navy" style="font-size:30px;margin-top:8px;font-weight:700">సబ్సిడీలు</div></div>
+    <div class="card" style="position:relative;flex:1;padding:26px 10px;text-align:center;animation:rise .45s 24.2s both"><div id="c3" style="font-size:78px;font-weight:800;color:#F07F1A;line-height:1;white-space:nowrap">0</div><div class="te navy" style="font-size:30px;margin-top:8px;font-weight:700">ఇన్‌స్టాల్డ్</div></div>
+  </div>
+  <div style="position:absolute;left:0;right:0;top:1500px;text-align:center;animation:pop .45s 26.3s both"><div class="pill n" style="font-size:34px">☀ PM Surya Ghar registered vendor</div></div>
+</div>
+
+<!-- ================= SCENE 5 · CTA 29.5–42s ================= -->
+<div class="scene" id="s5" style="animation:fin .3s 29.4s both">
+  <div class="brand"></div><div class="sunglow"></div><div class="rays"></div><div class="grid"></div>
+  <div style="position:absolute;left:0;right:0;top:170px;text-align:center;animation:pop .55s 29.6s cubic-bezier(.2,.9,.3,1.1) both"><div class="logoPill" style="position:relative;display:inline-flex;padding:14px 22px;border-radius:48px"><img src="img/logo_sq.png" style="width:250px;height:250px"></div></div>
+  <div class="h" style="top:520px">
+    <div class="te navy" style="font-size:72px"><span class="w" style="animation:pop .45s 30.3s both">సోలార్‌కి మారే</span> <span class="w orange" style="animation:pop .45s 30.55s both">టైం వచ్చింది</span></div>
+  </div>
+  <div style="position:absolute;left:0;right:0;top:690px;text-align:center;animation:pop .5s 31.2s both"><div style="display:inline-block;background:#F07F1A;color:#fff;border-radius:60px;padding:26px 60px;font-size:48px;font-weight:800;box-shadow:0 20px 50px rgba(240,127,26,.45);border:6px solid #fff;animation:pulse 1.4s 31.7s ease-in-out infinite both">Calculate my savings ▸</div></div>
+  <div style="position:absolute;left:0;right:0;top:840px;text-align:center;animation:rise .45s 32.0s both"><div class="te navy" style="font-size:44px;font-weight:700">🔗 Link in bio &nbsp;·&nbsp; <span style="font-family:'Pop';font-weight:800">@saanvika_solar</span></div></div>
+  <div style="position:absolute;left:0;right:0;top:940px;text-align:center;animation:pop .45s 32.8s both;--r:-1.5deg"><div class="pill w te" style="font-size:36px;font-weight:700">Comment <span class="orange" style="font-family:'Pop';font-weight:800">“SOLAR”</span> → లింక్ DM చేస్తాం</div></div>
+  <div class="card" style="left:90px;top:1090px;width:900px;background:#0F2A44;color:#fff;padding:36px 44px;animation:rise .5s 33.6s both">
+    <div style="font-size:26px;opacity:.8;font-weight:600;letter-spacing:2px">CALL · WHATSAPP</div>
+    <div style="font-size:60px;font-weight:800;line-height:1.15;margin-top:4px">85198 33679</div>
+    <div style="font-size:60px;font-weight:800;line-height:1.15">98853 15789</div>
+    <div class="te" style="font-size:30px;margin-top:18px;font-weight:700;color:#FFC46B">ఫ్రీ సైట్ సర్వే ✓ &nbsp; PM Surya Ghar vendor ✓ &nbsp; కాకినాడ</div>
+  </div>
+  <div class="te" style="position:absolute;left:100px;right:100px;top:1450px;text-align:center;font-size:24px;line-height:1.5;color:#46607a;font-weight:700;animation:fin .5s 35.0s both">ఇవి అంచనాలు మాత్రమే. ఫైనల్ రేటు, సబ్సిడీ, సైట్ సర్వే, అనుమతులు, స్కీము రూల్స్ మీద ఆధారపడి ఉంటాయి.<br><span style="font-family:'Pop';font-weight:600;font-size:21px">Estimates only. Final price, subsidy and eligibility depend on site survey, approvals and scheme rules. People shown are AI-generated.</span></div>
+</div>
+
+<!-- watermark from scene 2 onward -->
+<div style="position:absolute;left:36px;top:150px;background:rgba(255,255,255,.92);border-radius:40px;padding:8px 20px 8px 10px;display:flex;align-items:center;gap:10px;box-shadow:0 8px 22px rgba(0,0,0,.25);animation:fin .4s 4.3s both,fout .3s 20.7s forwards"><img src="img/logo_sq.png" style="width:62px;height:62px"><div style="font-size:24px;font-weight:800;color:#0F2A44">Saanvika Solar</div></div>
+
+</div>
+<script>
+const ease=x=>x<=0?0:x>=1?1:1-Math.pow(1-x,3);
+const fmt=n=>'₹'+Math.round(n).toLocaleString('en-IN');
+window.seek=t=>{
+  document.getAnimations().forEach(a=>{a.currentTime=t*1000;});
+  // with-solar counter 6.0 -> 7.6
+  const c=ease((t-6.05)/1.5); document.getElementById('cnt').textContent=fmt(3240-(3240-100)*c);
+  document.getElementById('cnt').style.color=c>=1?'#1d7a46':'#0F2A44';
+  // trust counters 24.0 -> 25.8
+  const k=ease((t-24.0)/1.8);
+  document.getElementById('c1').textContent=Math.round(296*k);
+  document.getElementById('c2').textContent=Math.round(290*k)+(k>=1?'+':'');
+  document.getElementById('c3').textContent=(k>=1?'1 MW+':(Math.round(1000*k)+' kW'));
+};
+seek(0);
+</script>
+</body>
+</html>
